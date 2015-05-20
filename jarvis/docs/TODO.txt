@@ -1,0 +1,43 @@
+Things TO DO in JARVIS when you are 0xDEAD
+------------------------------------------
+
+[done] Use a QSplitter within the layout in order to be able to resize! :)
+[done] Refactor the whole damn thing creating a "parent widget". Most widgets are very similar, I don't want to have to duplicate all changes to a QTable :)
+[fixed] Unicode strings bug!
+[done] Runtime options have an effect
+[done] Implement XOR of a selection?
+[done] Save scratchpad notes to file
+[done] Options -> Strings, Comments -> show unique hits (default: False)
+[done] Ability to order columns in tables
+[done] Add a QtGui.QColorDialog to select the PIN trace color at import time :)
+    See zetcode.com/gui/pysidetutorial/dialogs
+[done] Connection graph
+[done] Change from buttons to a nice toolbar :)
+[done] GUI for Connection graph :)
+[done] Get functions calling input (network, file, etc.)
+[done] Add icons to the CustomWidget table QMenu
+[don't implement] Save JARVIS state (json serialize to file)
+[done] Export current function for tools like miasm (binary ascii hex encoded)
+[don't implement] Implement export function (or selection) as ASM? To be able to inline it in C
+    This is done in IDA via Produce File -> MAP (or LST, I don't remember)
+[fixed] Option to see unique calls (calls missed, a lot!)
+[done] Search suspicious filenames too (inlined memcpy detected by IDA, etc.)
+[done] Import PIN information regarding dynamic call resolution
+[done] Add better exception traceback (traceback.format_exc())
+[done] Option to reflect the patched bytes (in the IDA database) to the binary file
+[done] Show immediate compares (Binary Analysis) display them in a table as well
+[done] Option to tighten the search for dangerous functions
+[fixed] "Show all functions" scrolls to the current one
+[done] Automatically find paths between "input" and "dangerous" functions
+[done] http://icons8.com (10k or more indexed icons)
+
+
+[] Format string detection
+[] Multibyte string (byte chars + multibyte) vs. Wide string (all chars have the same length)
+[] Analyze LoadLibrary / GetProcAddress information
+[] Connect graph for blocks within current function
+[] Export comments, names, etc. in JSON format. Useful to change between IDA versions!
+    This can be done via "export to idc file" but it always crashes importing :/
+    The idea is to have something more... lightweight
+
+[] Find functions similar to the current one

@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="github.css" type="text/css" />
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#j.a.r.v.i.s.">J.A.R.V.I.S.</a><ul>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#installation">Installation</a><ul>
+<li><a href="#dependencies">Dependencies</a></li>
+</ul></li>
+<li><a href="#graphical-user-interface">Graphical User Interface</a><ul>
+<li><a href="#binary-analysis">Binary Analysis</a></li>
+<li><a href="#bug-hunting">Bug Hunting</a></li>
+<li><a href="#import-export">Import &amp; Export</a></li>
+<li><a href="#scratchpad">Scratchpad</a></li>
+<li><a href="#options">Options</a></li>
+<li><a href="#other-gui-augmentation">Other GUI augmentation</a></li>
+</ul></li>
+<li><a href="#pintracer">PinTracer</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="j.a.r.v.i.s.">J.A.R.V.I.S.</h1>
+<h2 id="faq">FAQ</h2>
+<ul>
+<li>Why <em>JARVIS</em>?
+<ul>
+<li><em>JARVIS</em> means “Just Another ReVersIng Suite” or whatever other bullshit you can think of :)</li>
+</ul></li>
+<li>What is it?
+<ul>
+<li>It is a plugin for IDA Pro thought to assist you in the most common reversing tasks.</li>
+</ul></li>
+<li>Isn’t there already something similar?
+<ul>
+<li>Yes, “curious minds often converge on the same idea” :) and by the way, there is nothing new under the sun. Now seriously, Alex and Daniel got it right with the code organization of their <a href="https://bitbucket.org/daniel_plohmann/simplifire.idascope">IDAScope plugin</a>, so I used it as a skeleton for mine. Kudos to them!</li>
+</ul></li>
+<li>Why does the code suck so much?
+<ul>
+<li>Don’t let physicists do computer science.</li>
+</ul></li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p><em>JARVIS</em> is written entirely in Python and it is thought to be completely standalone. That means, although it runs within IDA, you can just copy its whole directory to anywhere you want. However, it is recommended (as a matter of convenience) to copy the <strong>jarvis</strong> directory and the plugin <strong>jarvis_launcher.py</strong> to <strong>plugins/</strong></p>
+<p>The auxiliary plugin <em>jarvis_launcher.py</em> registers a shortcut (Alt-J) which launches the actual plugin.</p>
+<h3 id="dependencies">Dependencies</h3>
+<ul>
+<li>Python 2.7.x (grab it <a href="https://www.python.org/downloads">here</a>)
+<ul>
+<li>Recommended Python 2.7.9+ (includes pip)</li>
+</ul></li>
+<li>NetworkX (pip install networkx)</li>
+<li>IDA Pro :)</li>
+</ul>
+<h2 id="graphical-user-interface">Graphical User Interface</h2>
+<p><em>JARVIS</em> is written in PySide (Qt). It consists of a dockable Widget with several <strong>tabs</strong>, one for each different <em>category</em>.</p>
+<p>There are three different kinds of widgets, namely:</p>
+<ul>
+<li>Table view (for example <em>calls within current function</em>)</li>
+<li>Tree view (for example <em>dword compares</em>)</li>
+<li>Text view (the <em>logging</em> at the bottom)</li>
+</ul>
+<div class="figure">
+<img src="img/main_ui.png" alt="JARVIS UI" />
+<p class="caption">JARVIS UI</p>
+</div>
+<h3 id="binary-analysis">Binary Analysis</h3>
+<p>Functionality related to <strong>binary analysis</strong> (dough!) without any special emphasis in vulnerability finding.</p>
+<p>At least I tried, sometimes the line between both is too thin.</p>
+<div class="figure">
+<img src="img/binary_analysis.png" alt="Binary Analysis Toolbar" />
+<p class="caption">Binary Analysis Toolbar</p>
+</div>
+<p>The options available in this tab are:</p>
+<ul>
+<li>Show most referenced functions</li>
+<li>Show dword compares</li>
+<li>Mark immediate compares within the current function</li>
+<li>Show calls within the current function</li>
+<li>Show comments within the current function</li>
+<li>Show referenced strings within the current function</li>
+<li>Show input (file and network) connecting to the current function</li>
+<li>Show a list of all functions in the binary</li>
+<li>Display connection graph (functions)</li>
+<li>Get all connections between functions accepting input and functions calling dangerous APIs</li>
+<li>Paint path(s) connecting two basic blocks</li>
+<li>XOR selected bytes
+<ul>
+<li>useful with malware / simple encryption schemes</li>
+</ul></li>
+</ul>
+<h3 id="bug-hunting">Bug Hunting</h3>
+<p>Functionality specifically designed around bug hunting goes here.</p>
+<p>There is not much at the moment…</p>
+<div class="figure">
+<img src="img/bug_hunting.png" alt="Bug Hunting toolbar" />
+<p class="caption">Bug Hunting toolbar</p>
+</div>
+<ul>
+<li>Detection of banned APIs (MS)</li>
+<li>Integer issues
+<ul>
+<li>Right now this is too x86 specific</li>
+<li>Buggy and it gets confused sometimes by loops or alike. However, false positives are quickly detected and discarded by a human agent.</li>
+<li>There will be false positives and negatives but as a rule of thumb you will need 10 minutes (tops) to go through them. On the bright side you will have found a handful of <em>potentially</em> exploitable code spots (stack, heap based buffer overflows).</li>
+<li>Now you need to determine whether you can influence the parameters with your input.</li>
+</ul></li>
+</ul>
+<h3 id="import-export">Import &amp; Export</h3>
+<p>This is for interacting with external tools.</p>
+<div class="figure">
+<img src="img/import_export.png" alt="Import / Export toolbar" />
+<p class="caption">Import / Export toolbar</p>
+</div>
+<ul>
+<li>Import a call trace from a <em>PinTool</em></li>
+<li>Export the trace to file in <em>GraphML</em> format
+<ul>
+<li>Import it to an external graph editor / viewer like Yed</li>
+</ul></li>
+<li>Import dynamic call resolution from a <em>PinTool</em></li>
+<li>Export current function as hex
+<ul>
+<li>This is needed by some tools</li>
+</ul></li>
+<li>Export patched bytes to file
+<ul>
+<li>Creates a copy of the original file replacing the bytes patched in the IDA database.</li>
+<li>Requested by m1k3 :)</li>
+</ul></li>
+</ul>
+<h3 id="scratchpad">Scratchpad</h3>
+<p>This is the <em>killer feature</em> :) You can even save your notes to a file! Yes, I know IDA Pro already has this feature and saves the data to the IDB file but it looked convenient to have everything in one place.</p>
+<h3 id="options">Options</h3>
+<p>Runtime options controlling things like the amount of information being displayed, etc.</p>
+<div class="figure">
+<img src="img/options.png" alt="Options tab" />
+<p class="caption">Options tab</p>
+</div>
+<ul>
+<li>Show unique strings</li>
+<li>Show unique comments</li>
+<li>Show unique calls</li>
+<li>Calculate entropy (for strings)</li>
+<li>Connect BB cutoff
+<ul>
+<li>The cutoff parameter for the algorithm calculating paths between basic blocks</li>
+</ul></li>
+<li>Connect functions cutoff
+<ul>
+<li>Analogous to the previous but for paths between functions</li>
+</ul></li>
+</ul>
+<h3 id="other-gui-augmentation">Other GUI augmentation</h3>
+<p>The main goal of <em>JARVIS</em> is to get out of the way while adding some nice features which allow you to work faster. With this goal in mind, some <em>GUI augmentation</em> has been added for your clicking pleasure.</p>
+<p><strong>Calculating paths between basic blocks</strong></p>
+<p>A new context menu has been added to the <em>disassembly view (the graph thingy)</em>. Of course it is labeled <em>JARVIS</em>.</p>
+<div class="figure">
+<img src="img/ctx_menu_connect_bb.png" alt="Connect basic blocks context menu" />
+<p class="caption">Connect basic blocks context menu</p>
+</div>
+<p>Simply right click the basic block on the graph view and select the appropiate menu entry. You will see some logging on IDA’s <em>output window</em></p>
+<p>Once you got both start and end basic blocks selected, click the <em>connect basic blocks</em> button to get a list of all possible paths connecting them. <img src="img/connect_bb_button.png" alt="Connect basic blocks toolbar button" /></p>
+<p>Double clicking the <em>Path ID</em> you will be presented with a color chooser widget where you can select a custom color to paint the choosen path on the graph view.</p>
+<p>A penetrating yellow always does the trick :)</p>
+<div class="figure">
+<img src="img/connect_bb_list.png" alt="All paths between selected basic blocks" />
+<p class="caption">All paths between selected basic blocks</p>
+</div>
+<p>Voila! There you have your very visual path between basic blocks.</p>
+<div class="figure">
+<img src="img/connect_bb_path.png" alt="Path connecting basic blocks" />
+<p class="caption">Path connecting basic blocks</p>
+</div>
+<h2 id="pintracer">PinTracer</h2>
+<p>The complementary tracing tool is <strong>Intel PIN based</strong> with a <em>PySide</em> GUI.</p>
+<p>Since IDA Pro has a version of PySide itself, it is advised to install PySide in a <em>virtual environment</em> (<a href="https://github.com/kennethreitz/python-guide/blob/master/docs/dev/virtualenvs.rst">read this</a>)</p>
+<div class="figure">
+<img src="img/pin_tracer_ui.png" alt="PinTracer UI (Mac OS X)" />
+<p class="caption">PinTracer UI (Mac OS X)</p>
+</div>
+</body>
+</html>

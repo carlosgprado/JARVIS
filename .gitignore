@@ -1,0 +1,7 @@
+*.pyc
+*.exe
+*.dll
+*.obj
+
+.DS_Store
+.idea/

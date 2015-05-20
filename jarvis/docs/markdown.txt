@@ -1,0 +1,39 @@
+Raw documentation is written in Markdown
+Python is used to convert this to HTML
+
+$ pip install markdown
+$ pip install Pygments
+
+# Convert to plain html
+$ markdown_py some_markdown.md > body.html
+
+# Generate the CSS
+$ pygmentize -S default -f html > codehilite.css
+
+# With code highlighting
+$ markdown_py -x codehilite some_markdown.md > body.html
+
+# Insert the HTML into this skeleton
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="./codehilite.css">
+</head>
+
+<body>
+
+<-- converted HTML contents go here
+
+</body>
+</html>
+
+
+------
+
+Another way would be to use PANDOC :)
+
+pandoc -s -S --toc -c github.css README.md -o README.html
+
