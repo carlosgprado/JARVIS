@@ -168,6 +168,13 @@ __Calculating paths between functions__
 
 Similarly to the method explained above, _JARVIS_ adds a new menu item to the popup for the _functions window_
 
+![Connect functions context menu](img/ctx_menu_connect_functions.png)
+
+![Connect functions button](img/connect_functions_button.png)
+
+![The graph showing the paths between functions](img/connect_functions_graph.png)
+
+The graph is of course _clickable_ and will take you to the corresponding function in IDA's _disassembly view_ by double clicking on a node.
 
 ## PinTracer ##
 
