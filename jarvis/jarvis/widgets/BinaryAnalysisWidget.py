@@ -313,7 +313,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         """
 
         # Retrieve some config values
-        show_misc.entropy = self.config.calculate_misc.entropy
+        show_misc.entropy = self.config.calculate_entropy
         show_unique_s = self.config.display_unique_strings
 
         self._console_output("Calculating string references...")
