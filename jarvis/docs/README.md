@@ -184,3 +184,14 @@ Since IDA Pro has a version of PySide itself, it is advised to install PySide in
 
 ![PinTracer UI (Mac OS X)](img/pin_tracer_ui.png)
 
+__To install it:__
+
+- Move the PinTracer folder to some location of your choice.
+- Run the _install.bat_ file. It will create a JARVISVE directory within PinTracer, create a virtual environment and install PySide
+- That should be it :)
+
+The batch script _run.bat_ takes care of transparently preparing the virtual environment and running the PinTracer program.
+
+About the PinTool itself. A version compiled for Windows 32 bits against [Pin 71313 (vc12)](http://software.intel.com/sites/landingpage/pintool/downloads/pin-2.14-71313-msvc12-windows.zip) is included.
+If you have another version of Pin, you will need to compile the PinTool against it. The source code is included (PinTracer/src_pintool/PinTracer.cpp) and the simplest way to compile it is to use the _MyPinTool_ trick, 
+well described [here](http://scrammed.blogspot.de/2013/03/binary-instrumentation-for-exploit_10.html)
