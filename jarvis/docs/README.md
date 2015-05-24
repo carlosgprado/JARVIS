@@ -9,7 +9,10 @@ FAQ
     - _JARVIS_ means "Just Another ReVersIng Suite" or whatever other bullshit you can think of :)
 
 - What is it?
-    - It is a plugin for IDA Pro thought to assist you in the most common reversing tasks.
+    - It is a small _bughunting_ suite comprising three elements, namely:
+    - A fuzzer (to be released)
+    - A tracer based on INTEL PIN
+    - A plugin for IDA Pro thought to assist you with the most common reversing tasks. It integrates with the tracer.
     
 - Isn't there already something similar?
     - Yes, "curious minds often converge on the same idea" :) and by the way, there is nothing new under the sun. 
@@ -138,6 +141,15 @@ Runtime options controlling things like the amount of information being displaye
     - Analogous to the previous but for paths between functions
 
 ### Other GUI augmentation ###
+
+__NOTE__: a large amount of people still using an older version of IDA, for unknown reasons (cough, chinese guy, cough, australian company). Since the GUI features described below are based on changes introduced in version 6.7 of IDA, JARVIS was unable to start.
+
+A quick workaround has been introduced to allow JARVIS to run in older versions of IDA, with limited functionality. 
+However, the "connect functions" graph can still be used by selecting the origin and destination functions clicking the "show all functions" button and using the context menu (see screenshot below)
+
+![Connect functions workaround](img/connect_functions_workaround.png)
+
+__And now for the IDA 6.7+ users__
 
 The main goal of _JARVIS_ is to get out of the way while adding some nice features which allow you to work faster. With this goal in mind, some _GUI augmentation_ has been added for your clicking pleasure.
 

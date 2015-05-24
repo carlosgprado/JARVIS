@@ -37,7 +37,10 @@
 </ul></li>
 <li>What is it?
 <ul>
-<li>It is a plugin for IDA Pro thought to assist you in the most common reversing tasks.</li>
+<li>It is a small <em>bughunting</em> suite comprising three elements, namely:</li>
+<li>A fuzzer (to be released)</li>
+<li>A tracer based on INTEL PIN</li>
+<li>A plugin for IDA Pro thought to assist you with the most common reversing tasks. It integrates with the tracer.</li>
 </ul></li>
 <li>Isn’t there already something similar?
 <ul>
@@ -74,7 +77,7 @@
 </div>
 <h3 id="binary-analysis">Binary Analysis</h3>
 <p>Functionality related to <strong>binary analysis</strong> (dough!) without any special emphasis in vulnerability finding.</p>
-<p>At least I tried, sometimes the line between both is too thin.</p>
+<p>At least I tried, sometimes the line between both is too thin…</p>
 <div class="figure">
 <img src="img/binary_analysis.png" alt="Binary Analysis Toolbar" />
 <p class="caption">Binary Analysis Toolbar</p>
@@ -82,15 +85,33 @@
 <p>The options available in this tab are:</p>
 <ul>
 <li>Show most referenced functions</li>
-<li>Show dword compares</li>
-<li>Mark immediate compares within the current function</li>
-<li>Show calls within the current function</li>
+<li>Show dword compares
+<ul>
+<li>Checks whether global variables are being compared to immediate values (binary-wide). These usually hold things like error codes or alike. Identifying and renaming them allow a better understanding of new code when found again.</li>
+</ul></li>
+<li>Mark immediate compares within the current function
+<ul>
+<li>It is helpful when analyzing something like a parser, for example.</li>
+</ul></li>
+<li>Show calls within the current function
+<ul>
+<li>When reversing large functions it is nice to have all information at once. For example, if at once all calls are UI related, we can probably just rename this function and move on.</li>
+</ul></li>
 <li>Show comments within the current function</li>
 <li>Show referenced strings within the current function</li>
-<li>Show input (file and network) connecting to the current function</li>
-<li>Show a list of all functions in the binary</li>
+<li>Show input (file and network) connecting to the current function
+<ul>
+<li>Functions accepting any kind of input, for which there is a path connecting them and the current function.</li>
+</ul></li>
+<li>Show a list of all functions in the binary
+<ul>
+<li>This is no longer necessary, will probably disappear in next versions.</li>
+</ul></li>
 <li>Display connection graph (functions)</li>
-<li>Get all connections between functions accepting input and functions calling dangerous APIs</li>
+<li>Get all connections between functions accepting input and functions calling dangerous APIs
+<ul>
+<li>This is very CPU intensive, use with caution.</li>
+</ul></li>
 <li>Paint path(s) connecting two basic blocks</li>
 <li>XOR selected bytes
 <ul>
@@ -138,7 +159,8 @@
 </ul></li>
 </ul>
 <h3 id="scratchpad">Scratchpad</h3>
-<p>This is the <em>killer feature</em> :) You can even save your notes to a file! Yes, I know IDA Pro already has this feature and saves the data to the IDB file but it looked convenient to have everything in one place.</p>
+<p>This is the <strong>killer feature</strong> :) You can even save your notes to a file!</p>
+<p>Yes, I know IDA Pro already has this feature and saves the data to the IDB file but it looked convenient to have everything in one place.</p>
 <h3 id="options">Options</h3>
 <p>Runtime options controlling things like the amount of information being displayed, etc.</p>
 <div class="figure">
@@ -160,6 +182,13 @@
 </ul></li>
 </ul>
 <h3 id="other-gui-augmentation">Other GUI augmentation</h3>
+<p><strong>NOTE</strong>: a large amount of people still using an older version of IDA, for unknown reasons (cough, chinese guy, cough, australian company). Since the GUI features described below are based on changes introduced in version 6.7 of IDA, JARVIS was unable to start.</p>
+<p>A quick workaround has been introduced to allow JARVIS to run in older versions of IDA, with limited functionality. However, the “connect functions” graph can still be used by selecting the origin and destination functions clicking the “show all functions” button and using the context menu (see screenshot below)</p>
+<div class="figure">
+<img src="img/connect_functions_workaround.png" alt="Connect functions workaround" />
+<p class="caption">Connect functions workaround</p>
+</div>
+<p><strong>And now for the IDA 6.7+ users</strong></p>
 <p>The main goal of <em>JARVIS</em> is to get out of the way while adding some nice features which allow you to work faster. With this goal in mind, some <em>GUI augmentation</em> has been added for your clicking pleasure.</p>
 <p><strong>Calculating paths between basic blocks</strong></p>
 <p>A new context menu has been added to the <em>disassembly view (the graph thingy)</em>. Of course it is labeled <em>JARVIS</em>.</p>
@@ -168,9 +197,13 @@
 <p class="caption">Connect basic blocks context menu</p>
 </div>
 <p>Simply right click the basic block on the graph view and select the appropiate menu entry. You will see some logging on IDA’s <em>output window</em></p>
-<p>Once you got both start and end basic blocks selected, click the <em>connect basic blocks</em> button to get a list of all possible paths connecting them. <img src="img/connect_bb_button.png" alt="Connect basic blocks toolbar button" /></p>
+<p>Once you got both start and end basic blocks selected, click the <em>connect basic blocks</em> button to get a list of all possible paths connecting them.</p>
+<div class="figure">
+<img src="img/connect_bb_button.png" alt="Connect basic blocks toolbar button" />
+<p class="caption">Connect basic blocks toolbar button</p>
+</div>
 <p>Double clicking the <em>Path ID</em> you will be presented with a color chooser widget where you can select a custom color to paint the choosen path on the graph view.</p>
-<p>A penetrating yellow always does the trick :)</p>
+<p>A penetrating yellow, for example, always does the trick :)</p>
 <div class="figure">
 <img src="img/connect_bb_list.png" alt="All paths between selected basic blocks" />
 <p class="caption">All paths between selected basic blocks</p>
@@ -180,6 +213,21 @@
 <img src="img/connect_bb_path.png" alt="Path connecting basic blocks" />
 <p class="caption">Path connecting basic blocks</p>
 </div>
+<p><strong>Calculating paths between functions</strong></p>
+<p>Similarly to the method explained above, <em>JARVIS</em> adds a new menu item to the popup for the <em>functions window</em></p>
+<div class="figure">
+<img src="img/ctx_menu_connect_functions.png" alt="Connect functions context menu" />
+<p class="caption">Connect functions context menu</p>
+</div>
+<div class="figure">
+<img src="img/connect_functions_button.png" alt="Connect functions button" />
+<p class="caption">Connect functions button</p>
+</div>
+<div class="figure">
+<img src="img/connect_functions_graph.png" alt="The graph showing the paths between functions" />
+<p class="caption">The graph showing the paths between functions</p>
+</div>
+<p>The graph is of course <em>clickable</em> and will take you to the corresponding function in IDA’s <em>disassembly view</em> by double clicking on a node.</p>
 <h2 id="pintracer">PinTracer</h2>
 <p>The complementary tracing tool is <strong>Intel PIN based</strong> with a <em>PySide</em> GUI.</p>
 <p>Since IDA Pro has a version of PySide itself, it is advised to install PySide in a <em>virtual environment</em> (<a href="https://github.com/kennethreitz/python-guide/blob/master/docs/dev/virtualenvs.rst">read this</a>)</p>
@@ -187,5 +235,13 @@
 <img src="img/pin_tracer_ui.png" alt="PinTracer UI (Mac OS X)" />
 <p class="caption">PinTracer UI (Mac OS X)</p>
 </div>
+<p><strong>To install it:</strong></p>
+<ul>
+<li>Move the PinTracer folder to some location of your choice.</li>
+<li>Run the <em>install.bat</em> file. It will create a JARVISVE directory within PinTracer, create a virtual environment and install PySide</li>
+<li>That should be it :)</li>
+</ul>
+<p>The batch script <em>run.bat</em> takes care of transparently preparing the virtual environment and running the PinTracer program.</p>
+<p>About the PinTool itself. A version compiled for Windows 32 bits against <a href="http://software.intel.com/sites/landingpage/pintool/downloads/pin-2.14-71313-msvc12-windows.zip">Pin 71313 (vc12)</a> is included. If you have another version of Pin, you will need to compile the PinTool against it. The source code is included (PinTracer/src_pintool/PinTracer.cpp) and the simplest way to compile it is to use the <em>MyPinTool</em> trick, well described <a href="http://scrammed.blogspot.de/2013/03/binary-instrumentation-for-exploit_10.html">here</a></p>
 </body>
 </html>
