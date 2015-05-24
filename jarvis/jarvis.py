@@ -6,7 +6,8 @@
 
 __VERSION__ = 0.5
 
-import os
+# Nasty workaround
+IS_NEW_IDA = True
 
 from idc import *
 from idautils import *
@@ -27,7 +28,11 @@ from jarvis.widgets.ImportExportWidget import ImportExportWidget
 from jarvis.widgets.ScratchPadWidget import ScratchPadWidget
 from jarvis.widgets.OptionsWidget import OptionsWidget
 
-from jarvis.core.helpers.UI import install_ui_hooks
+try:
+    from jarvis.core.helpers.UI import install_ui_hooks
+
+except NameError:
+    IS_NEW_IDA = False
 
 
 #################################################################
@@ -117,9 +122,20 @@ class JarvisPluginForm(PluginForm):
 
     def setupUI(self):
         """
-        Manages the IDA UI extensions / modifications
+        Manages the IDA UI extensions / modifications.
+        NOTE: This uses some GUI functionality introduced
+        in IDA 6.7
+        As a cheap workaround, I will deactivate the UI hooks
+        if the version of IDA does not support them. At least
+        a large portion of the plugin is still usable...
         """
-        install_ui_hooks()
+        if IS_NEW_IDA:
+            install_ui_hooks()
+
+        else:
+            print '[!] It appears your version of IDA is lower than 6.7'
+            print '[!] Some functionality has been deactivated (custom popup menus)'
+            print '[!] Other problems are expected but a large portion of JARVIS should be usable'
 
 
     def Show(self):

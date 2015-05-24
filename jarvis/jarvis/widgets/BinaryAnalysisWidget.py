@@ -313,7 +313,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         """
 
         # Retrieve some config values
-        show_misc.entropy = self.config.calculate_entropy
+        show_misc_entropy = self.config.calculate_entropy
         show_unique_s = self.config.display_unique_strings
 
         self._console_output("Calculating string references...")
@@ -327,7 +327,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self._console_output("[!] No string references found", err = True)
             return
 
-        if show_misc.entropy:
+        if show_misc_entropy:
             self.table.setColumnCount(3)
             self.table.setHorizontalHeaderLabels(("Address", "String", "misc.entropy"))
 
@@ -358,9 +358,9 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, string_item)
 
-            if show_misc.entropy:
-                misc.entropy_item = cw.NumQTableWidgetItem("%.4f" % misc.entropy(s))
-                self.table.setItem(idx, 2, misc.entropy_item)
+            if show_misc_entropy:
+                misc_entropy_item = cw.NumQTableWidgetItem("%.4f" % misc.entropy(s))
+                self.table.setItem(idx, 2, misc_entropy_item)
 
             idx += 1
 
