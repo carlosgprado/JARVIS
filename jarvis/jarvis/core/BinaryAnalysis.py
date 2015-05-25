@@ -80,9 +80,13 @@ class BinaryAnalysis():
             self.cache.string_list = []
 
             for v in s:
-                # unicode() is idempotent for ASCII strings
-                u = "%s" % unicode(v)
-                self.cache.string_list.append((v.ea, u))
+                try:
+                    # unicode() is idempotent for ASCII strings
+                    u = "%s" % unicode(v)
+                    self.cache.string_list.append((v.ea, u))
+
+                except:
+                    print "Error processing string at %x" % v.ea
 
 
     def get_string_references(self):
@@ -91,6 +95,11 @@ class BinaryAnalysis():
         @return: list of tuples [(xref addr, s), ...]
         """
         f = get_func(ScreenEA())
+        if not f:
+            # get_func returned None
+            print '[x] This does not look like a function...'
+            return []
+
         start = f.startEA
         end = f.endEA
 
