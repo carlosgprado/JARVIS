@@ -255,6 +255,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             addr_item = QTableWidgetItem("%08x" % addr)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
             callee_item =  QTableWidgetItem(callee)
+            callee_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
 
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, callee_item)
@@ -329,7 +330,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         if show_misc_entropy:
             self.table.setColumnCount(3)
-            self.table.setHorizontalHeaderLabels(("Address", "String", "misc.entropy"))
+            self.table.setHorizontalHeaderLabels(("Address", "String", "Entropy"))
 
         else:
             self.table.setColumnCount(2)
@@ -586,8 +587,11 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             if col.isValid():
                 # IDA works with BGR (annoying)
                 ida_color = misc.pyside_to_ida_color(col.name())
+                misc.paint_basic_blocks(bb_path, ida_color)
 
-            misc.paint_basic_blocks(bb_path, ida_color)
+            else:
+                print '[x] Invalid QColor'
+
             return
 
         except IndexError:

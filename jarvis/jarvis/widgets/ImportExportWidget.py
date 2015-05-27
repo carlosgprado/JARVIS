@@ -98,7 +98,7 @@ class ImportExportWidget(CustomWidget):
     #################################################################
     # GUI Callbacks
     #################################################################
-    def _showImportTrace(self):
+    def _showImportTrace(self, restrict = True):
         """
         This is the GUI part of the PIN trace import functionality
         """
@@ -128,7 +128,6 @@ class ImportExportWidget(CustomWidget):
         self.table_label.setText("Imported information from PIN trace")
         self.table.clearContents()
         self.table.setRowCount(0)
-
 
         # Fill with contents
         # TODO: This could be better in a QTree or maybe adding

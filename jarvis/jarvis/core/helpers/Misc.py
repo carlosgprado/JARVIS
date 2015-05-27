@@ -33,6 +33,17 @@ def pyside_to_ida_color(s):
 
 
 #################################################################
+def module_boundaries():
+    """
+    Convenience function.
+    Returns min and max addresses
+    :return: boundaries
+    """
+
+    return (MinEA(), MaxEA())
+
+
+#################################################################
 def function_boundaries(ea = None):
     """
     Convenience function

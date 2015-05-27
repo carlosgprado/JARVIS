@@ -142,15 +142,23 @@ class TraceImporter():
             if not '[T:' in x:
                 continue
 
+            # Dynamic call resolution start with '[I]'
+            if x.startswith('[I]'):
+                x = x.split('[I]')[-1].strip()
             t, a = x.split(']')
 
             u_ea, v_ea = map(lambda x: int(x, 16), a.split(call_str))
             thread_id = int(t.split(':')[-1])
 
+            # FIXME: This excludes the items from the file
+            # It would be better to filter at trace time
+            if u_ea > MaxEA() or v_ea > MaxEA():
+                continue
+
             trace_d[thread_id].append((u_ea, v_ea))
 
         # Cache this for later use
-        self.cache.d = trace_d
+        self.cache.trace_d = trace_d
 
         return trace_d
 
@@ -198,6 +206,7 @@ class TraceImporter():
             trace_d = self.cache.trace_d
 
         else:
+            print '[!] Could not find trace dictionary on cache'
             return None
 
         # TODO: working with tid 0 for now
