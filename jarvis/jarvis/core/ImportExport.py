@@ -145,6 +145,7 @@ class TraceImporter():
             # Dynamic call resolution start with '[I]'
             if x.startswith('[I]'):
                 x = x.split('[I]')[-1].strip()
+
             t, a = x.split(']')
 
             u_ea, v_ea = map(lambda x: int(x, 16), a.split(call_str))

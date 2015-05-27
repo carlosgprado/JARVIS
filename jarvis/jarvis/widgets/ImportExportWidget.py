@@ -98,7 +98,7 @@ class ImportExportWidget(CustomWidget):
     #################################################################
     # GUI Callbacks
     #################################################################
-    def _showImportTrace(self, restrict = True):
+    def _showImportTrace(self):
         """
         This is the GUI part of the PIN trace import functionality
         """
