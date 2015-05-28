@@ -24,6 +24,7 @@ call venv\Scripts\activate
 
 REM We are inside the virtualenv now (hopefully)
 pip install PySide
+pip install psutil
 
 echo ================================================
 echo PySide should be installed within a virtualenv

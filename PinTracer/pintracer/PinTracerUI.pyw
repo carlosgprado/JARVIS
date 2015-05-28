@@ -3,6 +3,7 @@
 #
 
 import sys
+import psutil
 import subprocess
 
 from PySide import QtGui
@@ -22,6 +23,9 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('icons/flask.png'))
         self.setWindowTitle('PIN Tracer')
         self.setGeometry(300, 250, 800, 350)
+
+        self.p = None
+
 
     def setupStatusBar(self):
         """
@@ -322,14 +326,22 @@ class MainWindow(QMainWindow):
 
         # Plus optional arguments
         if self.exec_args_edit.text():
-            argumentz.append("%s" % self.exec_args_edit.text())
+            # Let's assume arguments are of the form:
+            # "-l -p 4444 -n -v"
+            #_sep = '-'
+            #for a in self.exec_args_edit.text().split(_sep):
+            #    if a:
+            #        argumentz.append((_sep + a).strip())
+
+            argumentz += self.exec_args_edit.text().split()
 
 
         # Do it faggot!
         print argumentz     # debug
         self.myStatusBar.showMessage('Tracing...', 0)
-        subprocess.call(argumentz, shell = False)
-        self.myStatusBar.showMessage('Done', 0)
+        self.p = subprocess.Popen(argumentz,
+                                  shell = False,
+                                  creationflags = subprocess.CREATE_NEW_PROCESS_GROUP)
 
 
     def pauseTracing(self):
@@ -337,7 +349,8 @@ class MainWindow(QMainWindow):
 
 
     def stopTracing(self):
-        self.notYet()
+        self.kill_proc_tree(pid = self.p.pid)
+        self.myStatusBar.showMessage('Process terminated', 0)
 
 
     def editOptions(self):
@@ -382,6 +395,18 @@ class MainWindow(QMainWindow):
     ####################################################################
     # AUXILIARY
     ####################################################################
+    def kill_proc_tree(self, pid, including_parent = True):
+        """
+        Ah, Stack Overflow...
+        http://stackoverflow.com/questions/1230669/subprocess-deleting-child-processes-in-windows
+        """
+        parent = psutil.Process(pid)
+        for child in parent.children(recursive=True):
+            child.kill()
+
+        if including_parent:
+            parent.kill()
+
     def parseTraceFile(self, filename):
         """
         Extracts the interesting lines from the
