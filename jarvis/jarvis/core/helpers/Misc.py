@@ -371,16 +371,14 @@ class importManager():
 #################################################################
 # Shannon's entropy is a must :)
 #################################################################
-def entropy(s, ascii=True):
+def entropy(s):
     """
     Shannon's definition:
     sum{ x, -p(x) * log2(p(x)) }
     """
-    # TODO: This is for ASCII only
-
     H = 0.0
 
-    for c in string.printable:
+    for c in xrange(256):
         if s.count(c) > 0:
             H += -1.0 * p(c, s) * math.log(p(c, s), 2)
 
