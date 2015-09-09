@@ -27,6 +27,8 @@ from jarvis.widgets.BinaryAnalysisWidget import BinaryAnalysisWidget
 from jarvis.widgets.ImportExportWidget import ImportExportWidget
 from jarvis.widgets.ScratchPadWidget import ScratchPadWidget
 from jarvis.widgets.OptionsWidget import OptionsWidget
+from jarvis.widgets.FirmwareWidget import FirmwareWidget
+
 
 try:
     from jarvis.core.helpers.UI import install_ui_hooks
@@ -99,6 +101,7 @@ class JarvisPluginForm(PluginForm):
         self.jarvisWidgets.append(VulnDetectionWidget(self))
         self.jarvisWidgets.append(ImportExportWidget(self))
         self.jarvisWidgets.append(ScratchPadWidget(self))
+        self.jarvisWidgets.append(FirmwareWidget(self))
         self.jarvisWidgets.append(OptionsWidget(self))
 
         self.setupJarvisForm()

@@ -43,7 +43,8 @@ class FirmwareWidget(CustomWidget):
 
         # Output Layout
         # TODO: put the entropy graph here
-
+        self.splitter.addWidget(self.image_label)
+        self.splitter.addWidget(self.image)
         self.splitter.addWidget(self.table_label)
         self.splitter.addWidget(self.table)
         self.splitter.addWidget(self.output_label)
@@ -56,6 +57,7 @@ class FirmwareWidget(CustomWidget):
         """
 
         self.binary_entropy.calculate_entropy()
+        self.binary_entropy.cheap_scale()
         self.binary_entropy.adjust_entropy_values()
 
         im_w = self.binary_entropy.image_width
@@ -72,22 +74,20 @@ class FirmwareWidget(CustomWidget):
         qp = QtGui.QPixmap.fromImage(qi)
 
         # Apply the QPixmap to the label
-        self.image = QLabel()
+        self.image = QtGui.QLabel()
 
         self.image.setPixmap(qp)
         self.image.setObjectName('Entropy')
         self.image.mousePressEvent = self._getPos
 
-        hbox = QtGui.QHBoxLayout(self)
-        hbox.addWidget(self.image)
-        self.setLayout(hbox)
+        self.image_label = QtGui.QLabel('Entropy Graph')
 
 
-     def _getPos(self, event):
-         x = event.pos().x()
-         y = event.pos().y()
+    def _getPos(self, event):
+     x = event.pos().x()
+     y = event.pos().y()
 
-         print "(%d, %d)" % (x, y)
+     print "(%d, %d)" % (x, y)
 
 
     def _createToolBarActions(self):

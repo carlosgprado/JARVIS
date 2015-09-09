@@ -446,8 +446,13 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self._console_output("Creating connect graph...")
         res = True
 
-        u = InfoUI.function_orig_ea
-        v = InfoUI.function_dest_ea
+        try:
+            u = InfoUI.function_orig_ea
+            v = InfoUI.function_dest_ea
+
+        except:
+            self._console_output("[!] You must select the corresponding functions", err = True)
+
 
         cg = self.ba.get_connect_graph(u, v)
         res = self.ba.show_connect_graph(cg)
