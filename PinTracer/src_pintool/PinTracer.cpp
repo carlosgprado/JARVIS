@@ -67,6 +67,7 @@ BOOL withinExcludedModules(ADDRINT ip)
 {
 	for (modmap_t::iterator it = mod_data.begin(); it != mod_data.end(); ++it)
 	{
+		// If the module is included, no need to check anything
 		if (it->second.excluded == FALSE) continue;
 
 		// Is the [E|R]IP value within the range of any excluded module?
@@ -79,6 +80,8 @@ BOOL withinExcludedModules(ADDRINT ip)
 
 BOOL alreadyLoggedAddresses(ADDRINT ip)
 {
+	// TODO: This has to be terribly slow since loggedAddresses is a vector (list)
+	// Is this O(n)?
 	if (find(loggedAddresses.begin(), loggedAddresses.end(), ip) != loggedAddresses.end())
 	{
 		// item IS in vector
@@ -97,7 +100,6 @@ BOOL alreadyLoggedAddresses(ADDRINT ip)
 // Analysis function (execution time)
 void imageLoad_cb(IMG Img, void *v)
 {
-	const char* pathToProblemDll = KnobLogModule.Value().c_str();
 	const char* imageName = IMG_Name(Img).c_str();
 	ADDRINT lowAddress = IMG_LowAddress(Img);
 	ADDRINT highAddress = IMG_HighAddress(Img);
@@ -107,20 +109,22 @@ void imageLoad_cb(IMG Img, void *v)
 	else
 		TraceFile << "[-] Loaded module:\t" << imageName << endl;
 
-		if (strncmp(pathToProblemDll, "None", 4) == 0)
+	if (KnobLogModule.Value().empty())
+	{
+		// No option -only was given, normal exclusions are used instead
+		if (strncmp(imageName, "C:\\WINDOWS", 10) == 0)
 		{
-			// No option -only was given, normal exclusions are used instead
-			if (strncmp(imageName, "C:\\WINDOWS", 10) == 0)
-			{
-				// Filter out system dlls
-				TraceFile << "[!] Filtered " << imageName << endl;
-				// I'm not interested on code within these modules
-				mod_data[imageName].excluded = TRUE;
-				mod_data[imageName].begin = lowAddress;
-				mod_data[imageName].end = highAddress;
-			}
+			// Filter out system dlls
+			TraceFile << "[!] Filtered " << imageName << endl;
+			// I'm not interested on code within these modules
+			mod_data[imageName].excluded = TRUE;
+			mod_data[imageName].begin = lowAddress;
+			mod_data[imageName].end = highAddress;
 		}
-		else {
+	}
+	else {
+			const char* pathToProblemDll = KnobLogModule.Value().c_str();
+
 			if (strncmp(imageName, pathToProblemDll, strlen(pathToProblemDll)) != 0)
 			{
 				// Filter out everything except the -only parameter
@@ -130,7 +134,7 @@ void imageLoad_cb(IMG Img, void *v)
 				mod_data[imageName].begin = lowAddress;
 				mod_data[imageName].end = highAddress;
 			}
-		}
+	}
 
 	TraceFile << "[-] Module base:\t" << hex << lowAddress << endl;
 	TraceFile << "[-] Module end:\t" << hex << highAddress << endl;
@@ -156,7 +160,7 @@ void threadFinish_cb(THREADID threadIndex, const CONTEXT *ctxt, INT32 code, VOID
 // Log the basic block we are in (within a function)
 void LogBasicBlock(ADDRINT ip)
 {
-	// NOTE: Maybe inefficient here
+	// TODO: Maybe inefficient here
 	if (withinExcludedModules(ip))
 		return;
 
@@ -167,6 +171,11 @@ void LogBasicBlock(ADDRINT ip)
 // CALLBACKS implementing the actual LOGGING
 void LogCall(ADDRINT ip, ADDRINT target, THREADID tid, BOOL indirect)
 {
+	//
+	// The format is basically:
+	// [THREAD ID] Address of Call -> Address being called
+	//
+
 	/* -hit switch present: log only once (hit) */
 	if (KnobLogHit.Value() && alreadyLoggedAddresses(target))
 		return;
@@ -187,8 +196,12 @@ void LogCall(ADDRINT ip, ADDRINT target, THREADID tid, BOOL indirect)
 }
 
 
-void LogIndirectCall(ADDRINT ip, ADDRINT target, BOOL taken, THREADID tid)
+void LogIndirectCall(ADDRINT ip, ADDRINT target, THREADID tid, BOOL taken)
 {
+	//
+	// This is just a simple wrapper
+	//
+
 	if (!taken)
 		return;
 
@@ -257,8 +270,8 @@ void Trace(TRACE trace, void *v)
 				AFUNPTR(LogIndirectCall),	// Analysis function
 				IARG_INST_PTR,				// Caller
 				IARG_BRANCH_TARGET_ADDR,	// Well... target address? :)
-				IARG_BRANCH_TAKEN,			// Non zero if branch is taken
 				IARG_THREAD_ID,				// Thread ID (different from OS)
+				IARG_BRANCH_TAKEN,			// Non zero if branch is taken
 				IARG_END					// No more args
 				);
 
