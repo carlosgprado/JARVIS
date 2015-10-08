@@ -9,8 +9,10 @@
 #include <iostream>
 #include <fstream>
 #include <map>			// used for... maps:)
-#include <string.h>		// used for strncmp()
 #include <algorithm>	// used for find()
+#include <string.h>		// used for strncmp()
+#include <ctype.h>		// used for isupper(), etc.
+#include <jansson.h>	// JSON output
 #include "pin.H"
 
 using namespace std;
@@ -28,11 +30,16 @@ struct moduledata_t
 // Module information is saved here
 typedef std::map<string, moduledata_t> modmap_t;
 
-std::ofstream TraceFile;
+std::ofstream LogFile;
+std::ofstream JsonFile;
 vector<ADDRINT> loggedAddresses;
 modmap_t mod_data;
 PIN_LOCK lock;
 
+// JSON stuff
+json_t* root;
+json_t* call_array;
+json_t* module_array;
 
 // Command Line stuff
 KNOB<BOOL> KnobLogBB(KNOB_MODE_WRITEONCE, "pintool", "bb", "0", "log all basic blocks");
@@ -41,17 +48,84 @@ KNOB<BOOL> KnobLogMainImage(KNOB_MODE_WRITEONCE, "pintool", "main", "1", "log ma
 KNOB<string> KnobLogModule(KNOB_MODE_WRITEONCE, "pintool", "only", "None", "log only this module");
 KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool", "o", "calltrace.txt", "specify trace file name");
 
+////////////////////////////////
+// AUXILIARY functions
+////////////////////////////////
 
-// Finish and cleanup functions
-void Fini(INT32 code, void *v)
+/**
+Very cheap "convert to lowercase"
+Since it is not possible to overwrite a
+string literal it returns a pointer to
+another string
+*/
+char* c2lc(const char *s)
 {
-	// cleanup
-	TraceFile << endl << "---------------- End of trace ----------------" << endl;
-	TraceFile.close();
-	cout << endl << "[*] Log File closed" << endl;
+	char* sc = NULL;
+	char* p = NULL;
+
+	sc = _strdup(s);
+	if (!sc)
+		return sc;
+	else
+		p = sc;
+
+	for (; *s; ++s)
+	{
+		if (isupper(*s))
+			*p = tolower(*s);
+		else
+			*p = *s;
+		++p;
+	}
+
+	return sc;
 }
 
-// AUXILIARY functions
+
+/**
+Appends an element to the module array.
+Example:
+append_module(module_array, "kernel32.dll", 0x1000, 0x1FFF, true);
+*/
+void append_module(json_t* array, char* name, unsigned int begin, unsigned int end, bool excluded)
+{
+	json_t* module_e = json_object();
+
+	json_object_set_new(module_e, "name", json_string(name));
+	json_object_set_new(module_e, "begin", json_integer(begin));
+	json_object_set_new(module_e, "end", json_integer(end));
+
+	// Set to true or false
+	if (excluded)
+		json_object_set_new(module_e, "excluded", json_true());
+	else
+		json_object_set_new(module_e, "excluded", json_false());
+
+	json_array_append(array, module_e);
+}
+
+/**
+Appends an element to the call array.
+Example:
+append_call(call_array, 0, 0x123, 0xABC, false);
+*/
+void append_call(json_t* array, unsigned short tid, unsigned int u, unsigned int v, bool indirect)
+{
+	json_t* call_e = json_object();
+
+	json_object_set_new(call_e, "tid", json_integer(tid));
+	json_object_set_new(call_e, "u", json_integer(u));
+	json_object_set_new(call_e, "v", json_integer(v));
+
+	// Set to true or false
+	if (indirect)
+		json_object_set_new(call_e, "indirect", json_true());
+	else
+		json_object_set_new(call_e, "indirect", json_false());
+
+	json_array_append(array, call_e);
+}
+
 const char* StripPath(const char *path)
 {
 	const char *file = strrchr(path, '\\');	// backward slash (for windows paths)
@@ -95,56 +169,75 @@ BOOL alreadyLoggedAddresses(ADDRINT ip)
 	}
 }
 
+// Finish and cleanup functions
+void Fini(INT32 code, void *v)
+{
+	// write JSON dump
+	char* json_dump = json_dumps(root, JSON_ENCODE_ANY);
+	JsonFile.write(json_dump, strlen(json_dump));
+	JsonFile.close();
+
+	// Close log file
+	LogFile << endl << "---------------- End of trace ----------------" << endl;
+	LogFile.close();
+	cout << endl << "[*] Log File closed" << endl;
+}
 
 // This is called every time a MODULE (dll, etc.) is LOADED
 // Analysis function (execution time)
 void imageLoad_cb(IMG Img, void *v)
 {
 	const char* imageName = IMG_Name(Img).c_str();
+	bool excluded = false;
 	ADDRINT lowAddress = IMG_LowAddress(Img);
 	ADDRINT highAddress = IMG_HighAddress(Img);
 
 	if (IMG_IsMainExecutable(Img) && KnobLogMainImage.Value())
-		TraceFile << "[-] Analysing main image: " << StripPath(IMG_Name(Img).c_str()) << endl;
+		LogFile << "[-] Analysing main image: " << StripPath(IMG_Name(Img).c_str()) << endl;
 	else
-		TraceFile << "[-] Loaded module:\t" << imageName << endl;
+		LogFile << "[-] Loaded module:\t" << imageName << endl;
 
-	if (KnobLogModule.Value().empty())
+	if (strncmp(KnobLogModule.Value().c_str(), "None", 4) == 0)
 	{
 		// No option -only was given, normal exclusions are used instead
-		if (strncmp(imageName, "C:\\WINDOWS", 10) == 0)
+		if (strncmp(c2lc(imageName), "c:\\windows", 10) == 0)
 		{
 			// Filter out system dlls
-			TraceFile << "[!] Filtered " << imageName << endl;
+			LogFile << "[!] Filtered " << imageName << endl;
 			// I'm not interested on code within these modules
+			excluded = true;
 			mod_data[imageName].excluded = TRUE;
 			mod_data[imageName].begin = lowAddress;
 			mod_data[imageName].end = highAddress;
 		}
 	}
 	else {
-			const char* pathToProblemDll = KnobLogModule.Value().c_str();
+		const char* pathToProblemDll = KnobLogModule.Value().c_str();
 
-			if (strncmp(imageName, pathToProblemDll, strlen(pathToProblemDll)) != 0)
-			{
-				// Filter out everything except the -only parameter
-				TraceFile << "[!] Filtered " << imageName << endl;
-				// I'm not interested on code within these modules
-				mod_data[imageName].excluded = TRUE;
-				mod_data[imageName].begin = lowAddress;
-				mod_data[imageName].end = highAddress;
-			}
+		// Switch everything to lowercase before string comparison
+		if (strncmp(c2lc(imageName), c2lc(pathToProblemDll), strlen(pathToProblemDll)) != 0)
+		{
+			// Filter out everything except the -only parameter
+			LogFile << "[!] Filtered " << imageName << endl;
+			// I'm not interested on code within these modules
+			excluded = true;
+			mod_data[imageName].excluded = TRUE;
+			mod_data[imageName].begin = lowAddress;
+			mod_data[imageName].end = highAddress;
+		}
 	}
 
-	TraceFile << "[-] Module base:\t" << hex << lowAddress << endl;
-	TraceFile << "[-] Module end:\t" << hex << highAddress << endl;
+	append_module(module_array, (char*)imageName, lowAddress, highAddress, excluded);
+
+	LogFile << "[-] Module base:\t" << hex << lowAddress << endl;
+	LogFile << "[-] Module end:\t" << hex << highAddress << endl;
 }
 
 // Log some information related to THREAD execution
 void threadStart_cb(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v)
 {
 	PIN_GetLock(&lock, threadIndex + 1);
-	TraceFile << "[*] THREAD 0x" << hex << threadIndex << " STARTED. Flags: " << flags << endl;
+	LogFile << "[*] THREAD 0x" << hex << threadIndex << " STARTED. Flags: " << flags << endl;
 	PIN_ReleaseLock(&lock);
 }
 
@@ -152,7 +245,7 @@ void threadStart_cb(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v)
 void threadFinish_cb(THREADID threadIndex, const CONTEXT *ctxt, INT32 code, VOID *v)
 {
 	PIN_GetLock(&lock, threadIndex + 1);
-	TraceFile << "[*] THREAD 0x" << hex << threadIndex << " FINISHED. Code: " << dec << code << endl;
+	LogFile << "[*] THREAD 0x" << hex << threadIndex << " FINISHED. Code: " << dec << code << endl;
 	PIN_ReleaseLock(&lock);
 }
 
@@ -164,7 +257,7 @@ void LogBasicBlock(ADDRINT ip)
 	if (withinExcludedModules(ip))
 		return;
 
-	TraceFile << "  loc_" << hex << ip << ":" << endl;
+	LogFile << "  loc_" << hex << ip << ":" << endl;
 }
 
 
@@ -183,16 +276,7 @@ void LogCall(ADDRINT ip, ADDRINT target, THREADID tid, BOOL indirect)
 	if (withinExcludedModules(target))
 		return;
 
-	if (!indirect)
-	{
-		// Direct call. Keep it simple :)
-		TraceFile << "[T:" << dec << tid << "] " << hex << ip << " -> " << target << endl;
-	}
-	else
-	{
-		// Indirect call. Append a marker for parsing later
-		TraceFile << "[I] " << "[T:" << dec << tid << "] " << hex << ip << " -> " << target << endl;
-	}
+	append_call(call_array, tid, ip, target, indirect);
 }
 
 
@@ -303,18 +387,27 @@ int main(int argc, char *argv[])
 
 	if (PIN_Init(argc, argv)) return Usage();
 
-    TraceFile.open(KnobOutputFile.Value().c_str());
+	JsonFile.open("trace.json");
+	LogFile.open(KnobOutputFile.Value().c_str());
 
-    TraceFile << hex;
-    TraceFile.setf(ios::showbase);
+	LogFile << hex;
+	LogFile.setf(ios::showbase);
 
-    string trace_header = string("#\n"
-    							 "# Function Trace | Record of indirect calls\n"
-                                 "# Generated By Pin\n"
-                                 "#\n\n");
+	string trace_header = string("#\n"
+		"# Function Trace | Record of indirect calls\n"
+		"# Generated By Pin\n"
+		"#\n\n");
 
-    TraceFile.write(trace_header.c_str(), trace_header.size());
+	LogFile.write(trace_header.c_str(), trace_header.size());
 
+	/* JSON initialization */
+	root = json_object();
+	call_array = json_array();
+	module_array = json_array();
+	json_object_set_new(root, "calls", call_array);
+	json_object_set_new(root, "modules", module_array);
+
+	/* Instrumentation */
 	TRACE_AddInstrumentFunction(Trace, 0);				// Basic Block analysis
 	IMG_AddInstrumentFunction(imageLoad_cb, 0);			// Image activities
 	PIN_AddThreadStartFunction(threadStart_cb, 0);		// Thread start
