@@ -11,8 +11,8 @@ from idc import *
 from idaapi import *
 from idautils import *
 
+import json
 from collections import defaultdict
-
 
 import jarvis.core.helpers.Misc as misc
 import jarvis.core.helpers.Graphing as graphing
@@ -48,56 +48,6 @@ class ImportExport():
             return False
 
 
-    def import_dynamic_calls(self):
-        """
-        Gets information from a PIN tool
-        @return: dictionary
-        """
-        dyn_calls_dict = defaultdict(set)
-
-        filename = AskFile(1, "*.txt", "File to import information from?")
-
-        with open(filename, 'r') as f:
-            lines = f.readlines()
-            lines_i = [x.strip() for x in lines if x.startswith('[I]')]
-
-            # Need to rebase?
-            module_bases = [x.split('\t')[1] for x in lines if 'Module base' in x]
-            image_base = int(module_bases[0].strip(), 16)
-            ida_base = get_imagebase()  # idaapi
-            delta = image_base - ida_base
-
-            if delta:
-                # IDA would go ahead with the rebasing process
-                # even if the delta is zero. This avoids it.
-                rebase_program(delta, MSF_FIXONCE)
-
-            call_str = ' -> '
-
-            for line in lines_i:
-
-                # Sanity check
-                if not '[T:' in line:
-                    continue
-
-                a = line.split(']')[-1]
-    
-                eip, target = map(lambda x: int(x, 16), a.split(call_str))
-                # Filter dynamic calls related to system DLLs (ghetto)
-                if eip > 0x00800000:
-                    continue
-
-                # set: unique entries
-                dyn_calls_dict[eip].add(target)
-
-        # Add these calls to the IDB
-        for frm, to_list in dyn_calls_dict.iteritems():
-            for to in to_list:
-                AddCodeXref(frm, to, fl_CN)
-                # TODO: Display the imported info in a table format?
-                print "Added CodeXrefs from {} to {}".format(hex(frm), hex(to))
-
-
 
 class TraceImporter():
 
@@ -115,43 +65,35 @@ class TraceImporter():
         Returns the recorded image base
         at the time of execution (for rebasing in IDA)
         """
-        trace_s = open(filename, 'r').readlines()
-        module_bases = [x.split('\t')[1] for x in trace_s if 'Module base' in x]
-        image_base = int(module_bases[0].strip(), 16)
+        with open(filename, 'r') as f:
+            j_obj = json.loads(f.read())
 
-        return image_base
+        for m in j_obj['modules']:
+            # TODO: Get the loaded binary name!!!
+            if m['name'] == GetInputFilePath():
+                return m['begin']
+
+        return None
 
 
     def file_parser(self, filename):
         """
-        Read trace addresses (only basic blocks)
-        Format: [T:0] 0xcafe -> 0xbabe
+        Read trace addresses from a JSON file
+        Format: "calls" : [{"tid": 0, "u": 0xcafe, "v": 0xbabe, "indirect": true}, ...]
         @return: d[thread_id] = [(u_ea, v_ea), ...]
         """
 
         print "[*] Parsing file:", filename
         trace_d = defaultdict(list)
-        call_str = ' -> '
 
-        trace_s = open(filename, 'r').readlines()
-        trace_list = [line for line in trace_s if call_str in line]
+        with open(filename, 'r') as f:
+            j_obj = json.loads(f.read())
 
-        for x in trace_list:
-            x = x.strip()
-            # Sanity check
-            if not '[T:' in x:
-                continue
+        for c in j_obj['calls']:
+            u_ea = c['u']
+            v_ea = c['v']
+            thread_id = c['tid']
 
-            # Dynamic call resolution start with '[I]'
-            if x.startswith('[I]'):
-                x = x.split('[I]')[-1].strip()
-
-            t, a = x.split(']')
-
-            u_ea, v_ea = map(lambda x: int(x, 16), a.split(call_str))
-            thread_id = int(t.split(':')[-1])
-
-            # FIXME: This excludes the items from the file
             # It would be better to filter at trace time
             if u_ea > MaxEA() or v_ea > MaxEA():
                 continue
@@ -169,10 +111,14 @@ class TraceImporter():
         Pretty straightforward, isn't it? ;)
         @return: dictionary d[tid] = [bb_ea, ...]
         """
-        filename = AskFile(1, "*.*", "File to import addresses from?")
+        filename = AskFile(1, "*.json", "File to import addresses from?")
 
         # Rebase
         image_base = self.get_image_base(filename)
+        if not image_base:
+            print 'import_data() - Could not get image base from trace'
+            raise 'ImportFailure'
+
         ida_base = get_imagebase()  # idaapi
         delta = image_base - ida_base
 
@@ -189,6 +135,50 @@ class TraceImporter():
                 misc.paint_basic_blocks(v_ea, bb_color)
 
         return trace_dict
+
+
+    def import_dynamic_calls(self):
+        """
+        Gets information from a PIN tool
+        @return: dictionary
+        """
+        dyn_calls_dict = defaultdict(set)
+
+        filename = AskFile(1, "*.json", "File to import information from?")
+
+        with open(filename, 'r') as f:
+            j_obj = json.loads(f.read())
+
+            # Need to rebase?
+            image_base = self.get_image_base(filename)
+            ida_base = get_imagebase()  # idaapi
+            delta = image_base - ida_base
+
+            if delta:
+                # IDA would go ahead with the rebasing process
+                # even if the delta is zero. This avoids it.
+                rebase_program(delta, MSF_FIXONCE)
+
+            for c in j_obj['calls']:
+                if not c['indirect']:
+                    continue
+
+                u_ea = c['u']
+                v_ea = c['v']
+
+                # Filter dynamic calls related to system DLLs (ghetto)
+                if u_ea > 0x00800000:
+                    continue
+
+                # set: unique entries
+                dyn_calls_dict[u_ea].add(v_ea)
+
+        # Add these calls to the IDB
+        for frm, to_list in dyn_calls_dict.iteritems():
+            for to in to_list:
+                AddCodeXref(frm, to, fl_CN)
+                # TODO: Display the imported info in a table format?
+                print "Added CodeXrefs from {} to {}".format(hex(frm), hex(to))
 
 
     def export_to_graphml(self):

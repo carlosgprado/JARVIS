@@ -4,7 +4,7 @@
 # Description: This is the MAIN FILE for IDA's jarvis plugin
 #
 
-__VERSION__ = 0.5
+__VERSION__ = 0.6
 
 # Nasty workaround
 IS_NEW_IDA = True
@@ -96,11 +96,12 @@ class JarvisPluginForm(PluginForm):
         """
         print "= Creating / Loading individual widgets..."
 
+        # TODO: programatically load the desired widgets
         # Append to the list every widget you have
         self.jarvisWidgets.append(BinaryAnalysisWidget(self))
         self.jarvisWidgets.append(VulnDetectionWidget(self))
         self.jarvisWidgets.append(ImportExportWidget(self))
-        self.jarvisWidgets.append(ScratchPadWidget(self))
+        # self.jarvisWidgets.append(ScratchPadWidget(self))
         self.jarvisWidgets.append(FirmwareWidget(self))
         self.jarvisWidgets.append(OptionsWidget(self))
 

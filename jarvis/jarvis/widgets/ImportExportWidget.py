@@ -178,7 +178,7 @@ class ImportExportWidget(CustomWidget):
         self._console_output("Importing dynamic call resolution information...")
 
         try:
-            dyn_calls = self.ie.import_dynamic_calls()
+            dyn_calls = self.ie.ti.import_dynamic_calls()
 
         except:
             self._console_output("[!] Problem importing dynamic calls", err = True)

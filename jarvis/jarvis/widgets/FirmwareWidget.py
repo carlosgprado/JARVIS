@@ -10,7 +10,7 @@ from PySide.QtGui import QIcon
 from PySide.QtGui import QTableWidgetItem
 
 from jarvis.widgets.CustomWidget import CustomWidget
-import jarvis.core.helpers.BinaryEntropy as be
+import jarvis.core.helpers.BinaryEntropy as BE
 
 
 #################################################################
@@ -25,9 +25,10 @@ class FirmwareWidget(CustomWidget):
         self.parent = parent
         self.config = self.parent.config
         self.icon = QIcon(self.iconp + 'vuln_detection.png')
+        self.img_data = None
 
         # Functionality associated with this widget
-        self.binary_entropy = be.BinaryEntropy()
+        self.binary_entropy = BE.BinaryEntropy()
 
         self._createGui()
 
@@ -42,7 +43,6 @@ class FirmwareWidget(CustomWidget):
         self._createOutputTable()
 
         # Output Layout
-        # TODO: put the entropy graph here
         self.splitter.addWidget(self.image_label)
         self.splitter.addWidget(self.image)
         self.splitter.addWidget(self.table_label)
@@ -57,17 +57,17 @@ class FirmwareWidget(CustomWidget):
         """
 
         self.binary_entropy.calculate_entropy()
-        self.binary_entropy.cheap_scale()
         self.binary_entropy.adjust_entropy_values()
+        self.binary_entropy.cheap_scale()
 
         im_w = self.binary_entropy.image_width
         im_h = self.binary_entropy.image_height
 
         # Fastest way from array to string
-        data = ''.join([x for x in self.binary_entropy.entropy_d.itervalues()])
+        self.img_data = ''.join(self.binary_entropy.scaled_values)
 
         # Get QImage from QByteArray (from string)
-        ba = QtCore.QByteArray.fromRawData(data)
+        ba = QtCore.QByteArray.fromRawData(self.img_data)
         qi = QtGui.QImage(ba, im_w, im_h, QtGui.QImage.Format_RGB32)
 
         # Get the QPixmap from a QImage
@@ -84,10 +84,14 @@ class FirmwareWidget(CustomWidget):
 
 
     def _getPos(self, event):
-     x = event.pos().x()
-     y = event.pos().y()
+        """
+        Gets the (x, y) position from
+        clicking the image
+        """
+        x = event.pos().x()
+        y = event.pos().y()
 
-     print "(%d, %d)" % (x, y)
+        print "(%d, %d)" % (x, y)
 
 
     def _createToolBarActions(self):

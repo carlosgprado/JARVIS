@@ -3,6 +3,7 @@
 # Name: Misc.py
 # Description: Auxiliary functions which can not be stored anywhere else
 #
+
 from idc import *
 from idaapi import *
 from idautils import *
@@ -379,7 +380,7 @@ def entropy(s):
     H = 0.0
 
     for c in xrange(256):
-        if s.count(c) > 0:
+        if s.count(chr(c)) > 0:
             H += -1.0 * p(c, s) * math.log(p(c, s), 2)
 
     return H
@@ -389,7 +390,7 @@ def p(c, s):
     """
     Frequency of c in s
     """
-    return s.count(c) / (len(s) * 1.0)
+    return s.count(chr(c)) / (len(s) * 1.0)
 
 
 #################################################################
