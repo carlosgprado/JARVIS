@@ -10,9 +10,9 @@ from idc import *
 from idaapi import *
 from idautils import *
 
-from collections import defaultdict
-from math import log, sqrt
 import struct
+from collections import defaultdict
+from math import sqrt, log
 
 from Misc import entropy
 
@@ -25,10 +25,11 @@ class BinaryEntropy():
 
     def __init__(self):
         self.entropy_d = defaultdict(int)
-        self.scaled_values = list()
         self.image_width = 200
         self.image_height = 200
-        self.nr_cells = 100
+        self.nr_cells = 400
+        self.scaled_values = [0] * (self.image_width * self.image_height)
+        self.tile_size = 0
 
 
     def get_block_size(self):
@@ -75,6 +76,9 @@ class BinaryEntropy():
                     self.entropy_d[idx] = 3
 
 
+    #################################################################
+    # Auxiliary
+    #################################################################
     def adjust_entropy_values(self):
         """
         Remember that for N-sized blocks the entropy
@@ -86,42 +90,56 @@ class BinaryEntropy():
         entropy_max = log(self.get_block_size(), 2)
 
         # Correction: (e / e_max) * MAX
-        for idx, e in enumerate(self.scaled_values):
+        for idx, e in enumerate(self.entropy_d.itervalues()):
 
             adjusted_entropy = int((e / entropy_max) * RGB32_MAX)
 
             # Remember, we need strings
             adjusted_entropy_s = struct.pack('>I', adjusted_entropy)
-            #self.entropy_d[idx] = adjusted_entropy_s
-            self.entropy_d[idx] = '\xFF\x41\x41\x41'
+            self.entropy_d[idx] = adjusted_entropy_s
 
 
-    #################################################################
-    # Auxiliary
-    #################################################################
     def cheap_scale(self):
         """
         In order to scale the Pixmap, I will just modify
         the dataset accordingly.
         Not sure if genius or completely dumb...
+        Probably the latter.
         """
 
-        # Get "lines"
-        line_len = int(sqrt(self.nr_cells))
-        nr_lines = line_len # squares are nice :)
+        # Get "lines" (in nr. of tiles)
+        # Ex. 100 cells = 10 x 10 :)
+        tiles_per_row = int(sqrt(self.nr_cells))
 
-        # Scale factor
+        # Tile size (scale factor)
         # For now it is a square, so height = width
-        scale_factor = self.image_width / line_len
+        # Ex. 200 px / 10 cells = 20 px / cell
+        tile_size = self.image_width / tiles_per_row
 
         # "Flatten" the dictionary to a list of values
+        # This array is "nr_cells" long
         ev = [x for x in self.entropy_d.itervalues()]
 
-        for i in xrange(nr_lines):
-            # Each line
-            for t in xrange(scale_factor):
-                # scale factor "times"
-                for j in ev[i * line_len : (i + 1) * line_len]:
-                    # Each line element
-                    for tt in xrange(scale_factor):
-                        self.scaled_values.append(j)
+        pivots = []
+        for j in xrange(tiles_per_row):
+            for i in xrange(tiles_per_row):
+                p_idx = i * tile_size + j * self.image_width * tile_size
+                pivots.append(p_idx)
+
+        # There is a mapping between the pivots
+        # and the original entropy values
+        for idx in xrange(tiles_per_row * tiles_per_row):
+            p = pivots[idx]
+            for k in xrange(tile_size):
+                for l in xrange(tile_size):
+                    self.scaled_values[p + k + (l * self.image_width)] = ev[idx]
+
+
+    def get_chunk_from_pos(self, x, y):
+        """
+        It calculates the requested binary chunk
+        from the position clicked in the image
+        :param: (x, y) position in pixels
+        :return: Address within the binary
+        """
+        pass
