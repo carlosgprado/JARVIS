@@ -3,8 +3,8 @@
 #
 
 import sys
-import psutil
 import subprocess
+import process_json_traces as pjt
 
 from PySide import QtGui
 from PySide import QtCore
@@ -12,6 +12,8 @@ from PySide.QtGui import QApplication, QMainWindow, QStatusBar, QIcon, QRadioBut
 from PySide.QtGui import QWidget, QGroupBox, QPushButton, QLineEdit, QComboBox
 from PySide.QtGui import QFormLayout, QLabel, QProgressBar, QMessageBox
 from PySide.QtGui import QVBoxLayout, QHBoxLayout, QStyle, QCheckBox
+
+
 
 class MainWindow(QMainWindow):
 
@@ -23,9 +25,6 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('icons/flask.png'))
         self.setWindowTitle('PIN Tracer')
         self.setGeometry(300, 250, 800, 350)
-
-        self.p = None
-
 
     def setupStatusBar(self):
         """
@@ -46,10 +45,15 @@ class MainWindow(QMainWindow):
         name_label = QLabel('Executable name')
         args_label = QLabel('Executable arguments')
         out_label = QLabel('Output file')
+        bits_label = QLabel('Binary type')
 
         self.exec_name_edit = QLineEdit()
         self.exec_args_edit = QLineEdit()
         self.out_file_edit = QLineEdit()
+        self._32_bits = QRadioButton('32 bits')
+        self._32_bits.setChecked(True)
+
+        self._64_bits = QRadioButton('64 bits')
 
         browseButtonExe = QPushButton('Browse')
         browseButtonExe.clicked.connect(self.browseFileExe)
@@ -67,10 +71,16 @@ class MainWindow(QMainWindow):
         hboxOutput.addWidget(self.out_file_edit)
         hboxOutput.addWidget(browseButtonOutput)
 
+        hBoxBits = QHBoxLayout()
+        hBoxBits.addWidget(self._32_bits)
+        hBoxBits.addWidget(self._64_bits)
+
         vbox.setFormAlignment(QtCore.Qt.AlignLeft)
         vbox.addRow(name_label, hboxExe)
         vbox.addRow(out_label, hboxOutput)
         vbox.addRow(args_label, self.exec_args_edit)
+        vbox.addRow(bits_label, hBoxBits)
+
         groupbox.setLayout(vbox)
 
         return groupbox
@@ -249,7 +259,7 @@ class MainWindow(QMainWindow):
         """
         This is just a subprocess wrapper :)
         A typical command line invocation would be:
-        pin_bat.bat -t PinTracer32.dll [-only <path>] -- <path> [exe_args]
+        pin_bat.bat -t PinTracer32_json.dll [-only <path>] -- <path> [exe_args]
         """
         argumentz = []
 
@@ -268,7 +278,11 @@ class MainWindow(QMainWindow):
 
         # The PinTool DLL
         argumentz.append('-t')
-        argumentz.append('PinTracer32.dll')
+        if self._32_bits.isChecked():
+            argumentz.append('PinTracer32_json.dll')
+
+        else:
+            argumentz.append('PinTracer64_json.dll')
 
         # PinTool options
         if self.only_this_edit.text():
@@ -282,19 +296,19 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(
                 self,
                 'Warning',
-                'Saving trace as noise.txt'
+                'Saving trace as noise.json'
                 )
             argumentz.append('-o')
-            argumentz.append('noise.txt')
+            argumentz.append('noise.json')
 
         elif self.secondTrace.isChecked():
             QMessageBox.warning(
                 self,
                 'Warning',
-                'Saving trace as signal.txt'
+                'Saving trace as signal.json'
                 )
             argumentz.append('-o')
-            argumentz.append('signal.txt')
+            argumentz.append('signal.json')
 
         elif self.out_file_edit.text():
             argumentz.append('-o')
@@ -326,22 +340,14 @@ class MainWindow(QMainWindow):
 
         # Plus optional arguments
         if self.exec_args_edit.text():
-            # Let's assume arguments are of the form:
-            # "-l -p 4444 -n -v"
-            #_sep = '-'
-            #for a in self.exec_args_edit.text().split(_sep):
-            #    if a:
-            #        argumentz.append((_sep + a).strip())
-
-            argumentz += self.exec_args_edit.text().split()
+            argumentz.append("%s" % self.exec_args_edit.text())
 
 
         # Do it faggot!
         print argumentz     # debug
         self.myStatusBar.showMessage('Tracing...', 0)
-        self.p = subprocess.Popen(argumentz,
-                                  shell = False,
-                                  creationflags = subprocess.CREATE_NEW_PROCESS_GROUP)
+        subprocess.call(argumentz, shell = False)
+        self.myStatusBar.showMessage('Done', 0)
 
 
     def pauseTracing(self):
@@ -349,8 +355,7 @@ class MainWindow(QMainWindow):
 
 
     def stopTracing(self):
-        self.kill_proc_tree(pid = self.p.pid)
-        self.myStatusBar.showMessage('Process terminated', 0)
+        self.notYet()
 
 
     def editOptions(self):
@@ -369,13 +374,20 @@ class MainWindow(QMainWindow):
         """
         self.myStatusBar.showMessage('Diffing both traces...')
 
-        noise_l = self.parseTraceFile('noise.txt')
-        signal_l = self.parseTraceFile('signal.txt')
+        j_noise = pjt.load_trace_from_file('noise.json')
+        j_signal = pjt.load_trace_from_file('signal.json')
 
-        unique_l = [x for x in signal_l if x not in noise_l]
+        # Rebasing to a common base
+        j_noise, j_signal = pjt.rebase_traces(j_noise, j_signal)
 
-        with open('diff_trace.txt', 'w') as f:
-            f.writelines(unique_l)
+        j_diff = dict()
+        j_diff['modules'] = j_signal['modules']
+        # This is broken down for readability
+        s = j_signal['calls']
+        n = j_noise['calls']
+        j_diff['calls'] = [x for x in s if x not in n]
+
+        pjt.write_trace_to_file('diff_trace.json', j_diff)
 
         self.myStatusBar.showMessage('Done diffing')
 
@@ -395,74 +407,6 @@ class MainWindow(QMainWindow):
     ####################################################################
     # AUXILIARY
     ####################################################################
-    def kill_proc_tree(self, pid, including_parent = True):
-        """
-        Ah, Stack Overflow...
-        http://stackoverflow.com/questions/1230669/subprocess-deleting-child-processes-in-windows
-        """
-        parent = psutil.Process(pid)
-        for child in parent.children(recursive=True):
-            child.kill()
-
-        if including_parent:
-            parent.kill()
-
-    def parseTraceFile(self, filename):
-        """
-        Extracts the interesting lines from the
-        trace file, to do differential tracing
-        """
-        with open(filename, 'r') as f:
-            # You gotta love list comprehensions :)
-            # Search for the "thread pattern" ([T:N])
-            lines = [x for x in f.readlines() if '[T:' in x]
-
-        return lines
-
-
-    def getImageBase(self, filename):
-        """
-        The image base for the main executable is
-        located always at the beginning
-        """
-        with open(filename, 'r') as f:
-            lines = [x for x in f.readlines() if 'Module base' in x]
-
-        base_s = lines[0].split(':')[-1]
-        base = int(base_s.strip(), 16)
-
-        return base
-
-
-    def rebaseTraceFile(self, filename, new_base):
-        """
-        Working with text files is such a PITA
-        """
-        old_base = self.getImageBase(filename)
-        new_lines = []
-
-        with open(filename, 'r') as f:
-            lines = f.readlines()
-
-        for line in lines:
-            if '[T:' in line:
-                token_l = line.split()
-                for idx in xrange(len(token_l)):
-                    if token_l[idx].startswith('0x'):
-                        curr_offset = int(token_l[idx], 16) - old_base
-                        # Update the value and convert to string
-                        new_value = new_base + curr_offset
-                        token_l[idx] = "%08x" % new_value
-
-                new_lines.append(' '.join(token_l) + '\n')
-
-            else:
-                new_lines.append(line)
-
-        with open(filename, 'w') as f:
-            f.writelines(new_lines)
-
-
     def notYet(self):
         """
         Info is better than silently pass :)
@@ -512,7 +456,7 @@ class MainWindow(QMainWindow):
             self,
             "Output file",
             "",
-            "Text files (*.txt)"
+            "Text files (*.json)"
             )
 
         if filename:

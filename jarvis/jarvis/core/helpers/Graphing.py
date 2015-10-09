@@ -20,7 +20,7 @@ except:
     print "[!] Could not import NetworkX"
     print "[!] Some functionality will not be available"
 
-###################################################################################################
+
 class ConnectGraph(GraphViewer):
 
     def __init__(self, graph):
@@ -154,7 +154,6 @@ class ConnectGraph(GraphViewer):
         return True
 
 
-###################################################################################################
 class FunctionGraph():
 
     def __init__(self):
@@ -171,7 +170,7 @@ class FunctionGraph():
         :return: a subgraph in a format suitable for GraphViewer
         g_connect[node_ea] = set([child_1, child_2, ...])
         """
-        FG = BinaryGraph()
+        FG = binary_graph()
 
         paths = nx.all_simple_paths(FG, source = u, target = v, cutoff = co)
 
@@ -189,9 +188,6 @@ class FunctionGraph():
         return g_connect
 
 
-
-
-###########################################################
 class BlockGraph():
     def __init__(self, f_ea):
 
@@ -321,7 +317,7 @@ class BlockGraph():
 ###########################################################
 # Auxiliary stuff
 ###########################################################
-def BinaryGraph():
+def binary_graph():
     """
     This calculates a graph of the whole binary.
     :return: a graph in NetworkX format
