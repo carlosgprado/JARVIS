@@ -81,9 +81,7 @@ class BinaryAnalysis():
 
             for v in s:
                 try:
-                    # unicode() is idempotent for ASCII strings
-                    u = "%s" % unicode(v)
-                    self.cache.string_list.append((v.ea, u))
+                    self.cache.string_list.append((v.ea, unicode(v)))
 
                 except:
                     print "Error processing string at %x" % v.ea

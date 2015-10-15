@@ -29,6 +29,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         # Functionality associated with this widget
         self.ba = parent.binary_analysis
+        QtCore.QTextCodec.setCodecForCStrings(QtCore.QTextCodec.codecForName("UTF-8"))
 
         self._createGui()
 
@@ -353,7 +354,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.insertRow(idx)
             addr_item = QTableWidgetItem("%08x" % addr)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            string_item =  QTableWidgetItem("%s" % s)
+            string_item = QTableWidgetItem(s.decode('utf-8'))
             string_item.setFlags(string_item.flags() ^ QtCore.Qt.ItemIsEditable)
 
             self.table.setItem(idx, 0, addr_item)
@@ -452,7 +453,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         except:
             self._console_output("[!] You must select the corresponding functions", err = True)
-
 
         cg = self.ba.get_connect_graph(u, v)
         res = self.ba.show_connect_graph(cg)

@@ -16,6 +16,22 @@ import math
 
 
 #################################################################
+def to_str(unicode_or_string):
+    """
+    Efficient Python is a cool book :)
+    :param unicode_or_string: exactly that
+    :return: an instance of str
+    """
+    if isinstance(unicode_or_string, unicode):
+        value = unicode_or_string.encode('utf-8')
+
+    else:
+        value = unicode_or_string
+
+    return value
+
+
+#################################################################
 def pyside_to_ida_color(s):
     """
     Converts PySide color ('#RRGGBB') to

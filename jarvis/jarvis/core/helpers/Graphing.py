@@ -22,7 +22,6 @@ except:
 
 
 class ConnectGraph(GraphViewer):
-
     def __init__(self, graph):
         """
         This is an auxiliary GUI element.
@@ -32,7 +31,6 @@ class ConnectGraph(GraphViewer):
         super(ConnectGraph, self).__init__("Connect Graph")
         self.graph = graph
 
-
     def OnRefresh(self):
         """
         This is the main 'drawing' routine.
@@ -40,17 +38,17 @@ class ConnectGraph(GraphViewer):
         # TODO: this algorithm is a bit clumsy. Get back to it.
 
         self.Clear()
-        idNode = dict() # { node_ea : node_id }
+        id_node = dict()  # { node_ea : node_id }
 
         for node_ea in self.graph.keys():
-            # First, add all nodes and populate the idNode list
-            idNode[node_ea] = self.AddNode(node_ea)
+            # First, add all nodes and populate the id_node list
+            id_node[node_ea] = self.AddNode(node_ea)
 
         for paths in self.graph.values():
             # Add nodes without children (only ingress)
             for node_ea in paths:
-                if node_ea not in idNode:
-                    idNode[node_ea] = self.AddNode(node_ea)
+                if node_ea not in id_node:
+                    id_node[node_ea] = self.AddNode(node_ea)
 
         for node_ea, child_set in self.graph.iteritems():
             # Link the node with parents and children
@@ -58,59 +56,19 @@ class ConnectGraph(GraphViewer):
             # not just the ones belonging to the connected graph.
             for child in child_set:
                 try:
-                    self.AddEdge(idNode[node_ea], idNode[child])
+                    self.AddEdge(id_node[node_ea], id_node[child])
                 except:
                     continue
 
         # Calculate a handy reverse dictionary { node_id: node_ea }
         self.AddrNode = dict()
-        for ea, id in idNode.iteritems():
+        for ea, id in id_node.iteritems():
             self.AddrNode[id] = ea
 
         return True
 
-
-    def DisasmAround(self, node_id):
-        """
-        Writes the function disassembly
-        (around interesting function calls)
-        """
-        interesting_fn_names = list()
-        node_ea = self.AddrNode[node_id]
-
-        # We are interested in the function calls from the node, which
-        # are actually part of the connected graph :)
-        for x in self.graph[node_ea]:
-            if x in self.graph.keys(): # node list
-                interesting_fn_names.append(GetFunctionName(x))
-
-        position = 0
-        fi = FuncItems(node_ea)
-        f_items = list(fi) # generator -> list
-
-        NodeText = "[ %s ]\n\n" % GetFunctionName(node_ea)
-
-        for ins in f_items:
-            # Find call to interesting function and
-            # slice around the call in disasm
-            disasm = GetDisasm(ins)
-            if is_call_insn(ins):
-                for name in interesting_fn_names:
-                    if name in disasm:
-                        disasm_slice = f_items[position - 3 : position + 3]
-                        for instr in disasm_slice:
-                            NodeText += "%s\n" % GetDisasm(instr)
-
-                        NodeText += "[...]\n"
-
-            position += 1
-
-        return NodeText
-
-
     def OnGetText(self, node_id):
-        return (GetFunctionName(self.AddrNode[node_id]), 0x800000)
-
+        return GetFunctionName(self.AddrNode[node_id]), 0x800000
 
     def OnDblClick(self, node_id):
         """
@@ -119,18 +77,14 @@ class ConnectGraph(GraphViewer):
         Jump(self.AddrNode[node_id])
         return True
 
-
     def OnSelect(self, node_id):
         return True
-
 
     def OnHint(self, node_id):
         return "%x" % self.AddrNode[node_id]
 
-
     def OnClick(self, node_id):
         return True
-
 
     def OnCommand(self, cmd_id):
         """
@@ -140,7 +94,6 @@ class ConnectGraph(GraphViewer):
         if cmd_id == self.cmd_close:
             self.Close()
             return
-
 
     def Show(self):
         if not GraphViewer.Show(self):
@@ -155,14 +108,12 @@ class ConnectGraph(GraphViewer):
 
 
 class FunctionGraph():
-
     def __init__(self):
         """
         It leverages FlowChart API in order to calculate
         some graph properties (function granularity)
         """
-        pass
-
+        print "Instantiating a FunctionGraph object..."
 
     def connect_graph(self, u, v, co):
         """
@@ -171,13 +122,11 @@ class FunctionGraph():
         g_connect[node_ea] = set([child_1, child_2, ...])
         """
         FG = binary_graph()
-
         paths = nx.all_simple_paths(FG, source = u, target = v, cutoff = co)
 
-        paths_l = list(paths)
-
         g_connect = defaultdict(set)
-        for path in paths_l:
+
+        for path in paths:
             # path: [node_1, node_2, node_3, ...]
             node_ea = path[0]
 
@@ -195,7 +144,6 @@ class BlockGraph():
         self.f = FlowChart(get_func(f_ea), None, FC_PREDS)
         self.bb_graph = self._get_function_graph(self.f)
 
-
     def _get_function_graph(self, f):
         """
         It creates a graph of basic blocks and their children.
@@ -207,14 +155,13 @@ class BlockGraph():
         @return: dictionary { block_ea: [branch1_ea, branch2_ea], ... }
         """
 
-        bb_dict = defaultdict(list)     # Dict of BasicBlock objects
+        bb_dict = defaultdict(list)  # Dict of BasicBlock objects
 
         for bb in f:
             for child in bb.succs():
                 bb_dict[bb.startEA].append(child.startEA)
 
         return bb_dict
-
 
     def _graph_to_networkx(self, bb_dict):
         """
@@ -223,14 +170,13 @@ class BlockGraph():
         :param bb_dict: dictionary { block_ea: [branch1_ea, branch2_ea], ... }
         :return: NetworkX graph
         """
-        DG = nx.DiGraph()
+        dg = nx.DiGraph()
 
         for node, children in bb_dict.iteritems():
             for child in children:
-                DG.add_edge(node, child)
+                dg.add_edge(node, child)
 
-        return DG
-
+        return dg
 
     def find_connected_paths(self, co):
         """
@@ -243,7 +189,7 @@ class BlockGraph():
         :param co: The cutoff value
         :return: generator of lists or None
         """
-        G = self._graph_to_networkx(self.bb_graph)
+        g = self._graph_to_networkx(self.bb_graph)
 
         # Read this information from InfoUI
         try:
@@ -265,13 +211,12 @@ class BlockGraph():
 
         if _bb_start in bbl and _bb_end in bbl:
             # TODO: Select cutoff in OPTIONS widget at runtime
-            paths = nx.all_simple_paths(G, source = _bb_start, target = _bb_end, cutoff = co)
+            paths = nx.all_simple_paths(g, source = _bb_start, target = _bb_end, cutoff = co)
             return paths
 
         else:
             print '[!] find_connected_paths: check your marked start and end basic blocks!'
             return None
-
 
     def get_block_from_ea(self, ea):
         """
@@ -285,7 +230,6 @@ class BlockGraph():
 
         return None
 
-
     def get_block_preds(self, ea):
         """
         NOTE: Somehow preds() does not work,
@@ -297,7 +241,6 @@ class BlockGraph():
         current_bb = self.get_block_from_ea(ea)
 
         return list(current_bb.preds())
-
 
     def get_block_tail_ins(self, ea):
         """
@@ -320,25 +263,28 @@ class BlockGraph():
 def binary_graph():
     """
     This calculates a graph of the whole binary.
-    :return: a graph in NetworkX format
+    :return: a *DiGraph* in NetworkX format
     """
-    FG = nx.DiGraph()
+    fg = nx.DiGraph()
 
     for f_ea in Functions():
-        # TODO: Test a bit more the restrictions regarding
-        # the types of XRefs
-        for xref in XrefsTo(f_ea, 1):
+        for xref in XrefsTo(f_ea, True):
+            # NOTE: only code xrefs (that is, call sub_xxx or
+            # alike but not data refs, mov [eax], sub_xxx
+            if not xref.iscode:
+                continue
+
             (s, e) = misc.function_boundaries(xref.frm)
             if s:
-                FG.add_edge(s, f_ea)
+                fg.add_edge(s, f_ea)
 
-    return FG
+    return fg
 
 
 def cg_to_networkx(cg):
     """
     Converts a connect graph to a format
-    suitable for using with NetworkX (DiGraph)
+    suitable for using with NetworkX (Graph)
 
     Remember, connect graph format looks like this:
     { node_ea : {
@@ -347,14 +293,14 @@ def cg_to_networkx(cg):
             },
     ...}
     """
-    DG = nx.DiGraph()
+    dg = nx.DiGraph()
 
     # TODO: check this algorithm with loops
     for node_ea in cg:
         for child_ea in cg[node_ea]['children']:
-            DG.add_edge(node_ea, child_ea)
+            dg.add_edge(node_ea, child_ea)
 
-    return DG
+    return dg
 
 
 def cg_shortest_path(cg, u, v):
@@ -380,12 +326,12 @@ def write_to_graphml(edge_list, filename):
     :param edge_list: a list of edges [(u, v),...]
     :return: None
     """
-    DG = nx.DiGraph()
+    dg = nx.DigGraph()
     for u, v in edge_list:
-        DG.add_node(u, label = u)
-        DG.add_node(v, label = v)
-        DG.add_edge(u, v)
+        dg.add_node(u, label = u)
+        dg.add_node(v, label = v)
+        dg.add_edge(u, v)
 
-    nx.write_graphml(DG, filename)
+    nx.write_graphml(dg, filename)
 
     return True
