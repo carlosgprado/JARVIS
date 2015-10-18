@@ -7,8 +7,8 @@
 import traceback
 
 from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon, QBrush, QColor, QStyle
-from PySide.QtGui import QTableWidgetItem, QTreeWidgetItem
+from PySide.QtGui import QIcon
+from PySide.QtGui import QTableWidgetItem
 
 from jarvis.widgets.CustomWidget import CustomWidget
 import jarvis.core.helpers.Misc as misc
@@ -33,7 +33,6 @@ class ImportExportWidget(CustomWidget):
 
         self._createGui()
 
-
     def _createGui(self):
 
         self._createToolBar('ImportExport')
@@ -46,7 +45,6 @@ class ImportExportWidget(CustomWidget):
         self.splitter.addWidget(self.table)
         self.splitter.addWidget(self.output_label)
         self.splitter.addWidget(self.output_window)
-
 
     def _createToolBarActions(self):
 
@@ -94,7 +92,6 @@ class ImportExportWidget(CustomWidget):
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.patchAction)
 
-
     #################################################################
     # GUI Callbacks
     #################################################################
@@ -124,7 +121,8 @@ class ImportExportWidget(CustomWidget):
             return
 
         self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(('Thread ID', 'From', 'To', 'From (name)', 'To (name)'))
+        self.table.setHorizontalHeaderLabels(
+            ('Thread ID', 'From', 'To', 'From (name)', 'To (name)'))
         self.table_label.setText("Imported information from PIN trace")
         self.table.clearContents()
         self.table.setRowCount(0)
@@ -155,7 +153,6 @@ class ImportExportWidget(CustomWidget):
 
                 idx += 1
 
-
     def _showExportTraceGraphML(self):
         """
         This very long and comprehensive name says it all :)
@@ -169,7 +166,6 @@ class ImportExportWidget(CustomWidget):
         else:
             self._console_output("Exported successfully")
 
-
     def _showDynamicCalls(self):
         """
         Imports information regarding dynamic calls from a previous
@@ -178,13 +174,13 @@ class ImportExportWidget(CustomWidget):
         self._console_output("Importing dynamic call resolution information...")
 
         try:
+            # TODO: display the results in the widget
             dyn_calls = self.ie.ti.import_dynamic_calls()
 
         except:
             self._console_output("[!] Problem importing dynamic calls", err = True)
             self._console_output(traceback.format_exc(), err = True)
             return
-
 
     def _showExportFunction(self):
         """
@@ -193,7 +189,6 @@ class ImportExportWidget(CustomWidget):
         """
         self._console_output("Exporting the current function...")
         self.ie.export_current_function()
-
 
     def _patchBinary(self):
         """
@@ -208,7 +203,8 @@ class ImportExportWidget(CustomWidget):
             return
 
         self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(('File offset', 'Original', 'Patched'))
+        self.table.setHorizontalHeaderLabels(
+            ('File offset', 'Original', 'Patched'))
         self.table_label.setText("Patched bytes exported to file")
         self.table.clearContents()
         self.table.setRowCount(0)
@@ -227,4 +223,3 @@ class ImportExportWidget(CustomWidget):
             self.table.setItem(idx, 2, patch_item)
 
         self._console_output("Done patching. Look in the same directory as the original for a .patched file")
-

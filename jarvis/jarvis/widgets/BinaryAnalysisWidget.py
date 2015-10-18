@@ -6,11 +6,11 @@
 
 
 from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon, QStyle, QBrush, QColor
+from PySide.QtGui import QIcon
 from PySide.QtGui import QTableWidgetItem, QTreeWidgetItem
 
 import jarvis.widgets.CustomWidget as cw
-import jarvis.core.helpers.Misc  as misc
+import jarvis.core.helpers.Misc as misc
 from jarvis.core.helpers.InfoUI import InfoUI
 
 
@@ -29,10 +29,10 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         # Functionality associated with this widget
         self.ba = parent.binary_analysis
-        QtCore.QTextCodec.setCodecForCStrings(QtCore.QTextCodec.codecForName("UTF-8"))
+        QtCore.QTextCodec.setCodecForCStrings(
+            QtCore.QTextCodec.codecForName("UTF-8"))
 
         self._createGui()
-
 
     def _createGui(self):
 
@@ -50,7 +50,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.splitter.addWidget(self.output_label)
         self.splitter.addWidget(self.output_window)
 
-
     def _createToolBarActions(self):
 
         self.mostRefAction = QtGui.QAction(
@@ -62,15 +61,16 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         self.immCmpsAction = QtGui.QAction(
                 QIcon(self.iconp + 'mark_imm_cmps.png'),
-                '&Mark immediate compares within the current function. Useful with parsers',
+                '&Mark immediate compares within the current function. \
+                Useful with parsers',
                 self,
                 triggered = self._markImmCompares
                 )
 
-
         self.dwCmpsAction = QtGui.QAction(
                 QIcon(self.iconp + 'globals_cmp_imm.png'),
-                '&Search for global variables being compared to immediate values',
+                '&Search for global variables being compared \
+                to immediate values',
                 self,
                 triggered = self._showDwordCompares
                 )
@@ -119,7 +119,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         self.dangConnAction = QtGui.QAction(
                 QIcon(self.iconp + 'connect_io_danger.png'),
-                '&Shows all connections between IO input and dangerous functions (CPU intensive!)',
+                '&Shows all connections between IO input and dangerous \
+                functions (CPU intensive!)',
                 self,
                 triggered = self._showDangerousConnections
                 )
@@ -154,7 +155,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.xorAction)
 
-
     #################################################################
     # GUI Callbacks
     #################################################################
@@ -180,7 +180,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.insertRow(idx)
             addr_item = QTableWidgetItem("%x" % f_ea)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            ref_item =  cw.NumQTableWidgetItem("%d" % ref_nr)
+            ref_item = cw.NumQTableWidgetItem("%d" % ref_nr)
             name_item = QTableWidgetItem(ref_name)
 
             self.table.setItem(idx, 0, addr_item)
@@ -188,7 +188,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.setItem(idx, 2, name_item)
 
             idx += 1
-
 
     def _markImmCompares(self):
         """
@@ -211,14 +210,13 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
             addr_item = QTableWidgetItem("%x" % cmp_ea)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            dis_item =  cw.NumQTableWidgetItem("%s" % dis)
+            dis_item = cw.NumQTableWidgetItem("%s" % dis)
 
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, dis_item)
 
             misc.set_ins_color(cmp_ea, INS_COLOR)
             idx += 1
-
 
     def _callsInThisFunction(self):
         """
@@ -255,7 +253,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.insertRow(idx)
             addr_item = QTableWidgetItem("%08x" % addr)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            callee_item =  QTableWidgetItem(callee)
+            callee_item = QTableWidgetItem(callee)
             callee_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
 
             self.table.setItem(idx, 0, addr_item)
@@ -263,14 +261,14 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
             idx += 1
 
-
     def _commentsInThisFunction(self):
         """
         Shows all comments within the current function
         """
         show_unique_c = self.config.display_unique_comments
 
-        msg = "Searching comments within function '" + misc.get_function_name() + "'"
+        msg = "Searching comments within function '" + \
+            misc.get_function_name() + "'"
         self._console_output(msg)
 
         comment_list = self.ba.comments_in_function()
@@ -300,13 +298,12 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.insertRow(idx)
             addr_item = QTableWidgetItem("%08x" % addr)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            comment_item =  QTableWidgetItem(comment)
+            comment_item = QTableWidgetItem(comment)
 
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, comment_item)
 
-            idx += 0
-
+            idx += 1
 
     def _showStringXrefs(self):
         """
@@ -331,7 +328,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         if show_misc_entropy:
             self.table.setColumnCount(3)
-            self.table.setHorizontalHeaderLabels(("Address", "String", "Entropy"))
+            self.table.setHorizontalHeaderLabels(
+                ("Address", "String", "Entropy"))
 
         else:
             self.table.setColumnCount(2)
@@ -388,11 +386,10 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             for value, addr in values:
                 value_item = QTreeWidgetItem(dw_item)
                 value_item.setText(1, value)
-                value_item.setText(2, "%x" %addr)
+                value_item.setText(2, "%x" % addr)
 
         # Display all items expanded initially
         self.tree.expandAll()
-
 
     def _showAllFunctions(self):
         """
@@ -426,7 +423,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             name_item = QTableWidgetItem("%s" % f_name)
 
             if f_ea == current_ea:
-                current_ea_item = addr_item
+                # current_ea_item = addr_item
                 c_idx = idx
 
             self.table.setItem(idx, 0, addr_item)
@@ -434,11 +431,10 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         # Conveniently scroll to the current EA
         self.table.scrollToItem(
-            #current_ea_item,
+            # current_ea_item,
             self.table.item(c_idx, 0),
             QtGui.QAbstractItemView.PositionAtTop
             )
-
 
     def _showConnectionGraph(self):
         """
@@ -452,7 +448,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             v = InfoUI.function_dest_ea
 
         except:
-            self._console_output("[!] You must select the corresponding functions", err = True)
+            self._console_output("[!] You must select the \
+                corresponding functions", err = True)
 
         cg = self.ba.get_connect_graph(u, v)
         res = self.ba.show_connect_graph(cg)
@@ -461,7 +458,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self._console_output(
                 "[x] No connection between %08x and %08x" % (u, v),
                 err = True)
-
 
     def _showConnectedIO(self):
         """
@@ -472,7 +468,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         io_list = self.ba.input_to_function()
 
         if not io_list:
-            self._console_output("[!] No (obvious) IO connecting to this function", err = True)
+            self._console_output("[!] No (obvious) IO connecting \
+                to this function", err = True)
             return
 
         self.table.setColumnCount(2)
@@ -492,7 +489,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, name_item)
 
-
     def _showDangerousConnections(self):
         """
         Shows connections graphs between functions calling IO
@@ -506,7 +502,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             return
 
         self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(("IO Caller", "Dangerous Functions", "Shortest Path Length", "u", "v"))
+        self.table.setHorizontalHeaderLabels(
+            ("IO Caller", "Dangerous Functions", "Shortest Path Length", "u", "v"))
 
         self.table_label.setText("Dangerous Connections")
         self.table.clearContents()
@@ -530,7 +527,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.setItem(idx, 3, ioa_item)
             self.table.setItem(idx, 4, dfa_item)
 
-
     def _showConnectedBBs(self):
         """
         Shows a list of paths between selected basic blocks
@@ -539,7 +535,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         bb_paths = self.ba.get_bb_connect_graph(self.config.connect_bb_cutoff)
 
         if not bb_paths:
-            self._console_output("[!] Could not find paths between basic blocks", err = True)
+            self._console_output("[!] Could not find paths between \
+                basic blocks", err = True)
             return
 
         self.table.setColumnCount(2)
@@ -552,10 +549,11 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.table.clearContents()
         self.table.setRowCount(0)
 
-        bb_paths_l = list(bb_paths) # To reference by index :)
+        bb_paths_l = list(bb_paths)  # To reference by index :)
 
         if len(bb_paths_l) == 0:
-            self._console_output("[!] Could not find paths. Try increasing cutoff under Options", err = True)
+            self._console_output("[!] Could not find paths. \
+                Try increasing cutoff under Options", err = True)
             return
 
         for idx, path in enumerate(bb_paths_l):
@@ -571,7 +569,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         # Cache this
         self.ba.cache.bb_paths = bb_paths_l
-
 
     def _bbTableDoubleClicked(self, row, col):
         """
@@ -607,7 +604,6 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             # Address value (containing [A-F]) fucks up int()
             return
 
-
     def _xorSelection(self):
         """
         It XORs the selected bytes with a single-byte key
@@ -616,4 +612,3 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
         self._console_output("XOR'ing selected bytes...")
         self.ba.xor_patcher()
-

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Name: Graphing.py
-# Description: Routines to aid with creation of custom graphs and their manipulation.
+# Description: Routines regarding creation of custom graphs
 #
 
 from idc import *

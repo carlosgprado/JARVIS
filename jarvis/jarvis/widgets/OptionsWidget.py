@@ -9,6 +9,7 @@ from PySide import QtGui, QtCore
 from PySide.QtGui import QIcon, QSpinBox
 from PySide.QtGui import QCheckBox, QLabel
 
+
 #################################################################
 class OptionsWidget(QtGui.QWidget):
 
@@ -25,7 +26,6 @@ class OptionsWidget(QtGui.QWidget):
 
         self._createGui()
 
-
     def _createGui(self):
         """
         Grid layout containing groupBoxes
@@ -36,7 +36,6 @@ class OptionsWidget(QtGui.QWidget):
         grid.addWidget(self.createVulnOptions(), 0, 1)
 
         self.setLayout(grid)
-
 
     def createBinaryOptions(self):
         """
@@ -58,10 +57,14 @@ class OptionsWidget(QtGui.QWidget):
 
         # Default states are read from the Config
         # class and reflected in the GUI
-        cbs_unique_str.setCheckState(self.get_state(self.config.display_unique_strings))
-        cbs_unique_com.setCheckState(self.get_state(self.config.display_unique_comments))
-        cbs_unique_calls.setCheckState(self.get_state(self.config.display_unique_calls))
-        cbs_entropy.setCheckState(self.get_state(self.config.calculate_entropy))
+        cbs_unique_str.setCheckState(
+            self.get_state(self.config.display_unique_strings))
+        cbs_unique_com.setCheckState(
+            self.get_state(self.config.display_unique_comments))
+        cbs_unique_calls.setCheckState(
+            self.get_state(self.config.display_unique_calls))
+        cbs_entropy.setCheckState(
+            self.get_state(self.config.calculate_entropy))
         sb_cutoff.setValue(self.config.connect_bb_cutoff)
         sbf_cutoff.setValue(self.config.connect_func_cutoff)
 
@@ -88,7 +91,6 @@ class OptionsWidget(QtGui.QWidget):
 
         return groupBox
 
-
     def createVulnOptions(self):
         """
         Vulnerability Discovery related
@@ -101,7 +103,8 @@ class OptionsWidget(QtGui.QWidget):
 
         # Default states are read from the Options
         # class and reflected in the GUI
-        cbv_deep_dang.setCheckState(self.get_state(self.config.deep_dangerous_functions))
+        cbv_deep_dang.setCheckState(
+            self.get_state(self.config.deep_dangerous_functions))
 
         # Connect elements and signals
         cbv_deep_dang.stateChanged.connect(self.deep_dangerous)
@@ -115,42 +118,34 @@ class OptionsWidget(QtGui.QWidget):
 
         return groupBox
 
-
-    ###############################################################################
+    ##########################################################################
     # GUI callbacks
-    ###############################################################################
+    ##########################################################################
     # TODO: OPTIMIZE THIS FOR THE LOVE OF GOD!!!
     def string_unique(self, state):
         self.config.display_unique_strings = (state == QtCore.Qt.Checked)
 
-
     def comment_unique(self, state):
         self.config.display_unique_comments = (state == QtCore.Qt.Checked)
-
 
     def calls_unique(self, state):
         self.config.display_unique_calls = (state == QtCore.Qt.Checked)
 
-
     def string_entropy(self, state):
         self.config.calculate_entropy = (state == QtCore.Qt.Checked)
-
 
     def deep_dangerous(self, state):
         self.config.deep_dangerous_functions = (state == QtCore.Qt.Checked)
 
-
     def set_cutoff(self, co):
         self.config.connect_bb_cutoff = co
-
 
     def set_func_cutoff(self, co):
         self.config.connect_func_cutoff = co
 
-
-    ###############################################################################
+    ##########################################################################
     # Auxiliary
-    ###############################################################################
+    ##########################################################################
     def get_state(self, option):
         """
         This translates options (boolean)
@@ -161,4 +156,3 @@ class OptionsWidget(QtGui.QWidget):
 
         else:
             return QtCore.Qt.Unchecked
-

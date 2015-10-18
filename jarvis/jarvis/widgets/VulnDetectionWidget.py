@@ -32,7 +32,6 @@ class VulnDetectionWidget(CustomWidget):
 
         self._createGui()
 
-
     def _createGui(self):
 
         self._createToolBar('Vulnerability')
@@ -49,7 +48,6 @@ class VulnDetectionWidget(CustomWidget):
         self.splitter.addWidget(self.table)
         self.splitter.addWidget(self.output_label)
         self.splitter.addWidget(self.output_window)
-
 
     def _createToolBarActions(self):
 
@@ -70,7 +68,6 @@ class VulnDetectionWidget(CustomWidget):
         self.toolbar.addAction(self.bannedAction)
         self.toolbar.addAction(self.integerAction)
 
-
     #################################################################
     # GUI Callbacks
     #################################################################
@@ -83,7 +80,8 @@ class VulnDetectionWidget(CustomWidget):
         deep_search_f = self.config.deep_dangerous_functions
 
         if deep_search_f:
-            self._console_output("Performing a deep search (based on function name)")
+            self._console_output("Performing a deep search \
+                (based on function name)")
 
         banned_refs_dict = self.vd.find_banned_functions(deep_search_f)
 
@@ -101,13 +99,12 @@ class VulnDetectionWidget(CustomWidget):
 
             for ref_addr in refs:
                 ref_item = QTreeWidgetItem(bf_item)
-                ref_item.setText(1, "%x" %ref_addr)
+                ref_item.setText(1, "%x" % ref_addr)
                 ref_name = misc.get_function_name(ref_addr)
                 ref_item.setText(2, ref_name)
 
         # Display all items expanded initially
         self.tree.expandAll()
-
 
     def _showIntegerIssues(self):
         """
@@ -130,7 +127,8 @@ class VulnDetectionWidget(CustomWidget):
 
         self.table.setColumnCount(3)
         self.table_label.setText("Possible integer issues")
-        self.table.setHorizontalHeaderLabels(('Address', 'Function name', 'Notes'))
+        self.table.setHorizontalHeaderLabels(
+            ('Address', 'Function name', 'Notes'))
         self.table.clearContents()
         self.table.setRowCount(0)
 
@@ -141,9 +139,8 @@ class VulnDetectionWidget(CustomWidget):
             addr_item = QTableWidgetItem("%x" % ins_ea)
             addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)
             name_item = QTableWidgetItem(misc.get_function_name(ins_ea))
-            mnem_item = QTableWidgetItem("")    # placeholder
+            mnem_item = QTableWidgetItem("")  # placeholder
 
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, name_item)
             self.table.setItem(idx, 2, mnem_item)
-

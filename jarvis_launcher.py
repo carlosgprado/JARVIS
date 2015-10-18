@@ -1,5 +1,6 @@
 import idaapi
 
+
 class jarvis_launcher_t(idaapi.plugin_t):
     flags = idaapi.PLUGIN_UNL
     comment = "Simple JARVIS Launcher"
@@ -17,6 +18,7 @@ class jarvis_launcher_t(idaapi.plugin_t):
 
     def term(self):
         pass
+
 
 def PLUGIN_ENTRY():
     return jarvis_launcher_t()

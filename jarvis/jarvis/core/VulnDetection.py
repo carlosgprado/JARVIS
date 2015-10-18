@@ -15,7 +15,7 @@ import jarvis.core.helpers.Misc as misc
 from jarvis.core.helpers.IntegerIssues import IntegerIssues
 
 
-####################################################################################
+#############################################################################
 class VulnDetection():
 
     def __init__(self):
@@ -28,7 +28,6 @@ class VulnDetection():
         self.ii = IntegerIssues()
         self.cache = VulnDetectionCache()
 
-
     def find_string_format(self):
         """
         First attempt to find possible string
@@ -40,7 +39,6 @@ class VulnDetection():
             if n.lower() in dangerous_funcs:
                 # This is an "interesting" import
                 pass
-
 
     def find_dangerous_function_names(self):
         """
@@ -61,14 +59,14 @@ class VulnDetection():
 
         return dang_funcnames
 
-
     def find_banned_functions(self, deep_search = True):
         """
         Functions banned by Microsoft.
         Included functions with suspicious names
         (maybe inlined and detected by IDA)
         """
-        if not self.cache.last_deep_search_param or self.cache.last_deep_search_param != deep_search:
+        if not self.cache.last_deep_search_param or \
+                self.cache.last_deep_search_param != deep_search:
             # This is the first time we hit this
             # or the deep_search param has changed since
             # the last call, either way calculate from scratch
@@ -95,10 +93,9 @@ class VulnDetection():
         return self.cache.banned_refs
 
 
-####################################################################################
+##############################################################################
 class VulnDetectionCache():
 
     def __init__(self):
         self.last_deep_search_param = None
         self.banned_refs = None
-

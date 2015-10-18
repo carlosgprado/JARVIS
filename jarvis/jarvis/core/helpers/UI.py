@@ -10,8 +10,8 @@ from idautils import *
 
 from InfoUI import InfoUI
 
-
 hooks = None
+
 
 class InitBBHandler(action_handler_t):
     """
@@ -27,7 +27,8 @@ class InitBBHandler(action_handler_t):
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == BWN_DISASM else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_FORM if ctx.form_type == \
+            BWN_DISASM else AST_DISABLE_FOR_FORM
 
 
 class FinalBBHandler(action_handler_t):
@@ -44,7 +45,8 @@ class FinalBBHandler(action_handler_t):
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == BWN_DISASM else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_FORM if ctx.form_type == \
+            BWN_DISASM else AST_DISABLE_FOR_FORM
 
 
 class InitialFuncHandler(action_handler_t):
@@ -68,7 +70,8 @@ class InitialFuncHandler(action_handler_t):
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == BWN_FUNCS else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_FORM if ctx.form_type == \
+            BWN_FUNCS else AST_DISABLE_FOR_FORM
 
 
 class FinalFuncHandler(action_handler_t):
@@ -91,8 +94,8 @@ class FinalFuncHandler(action_handler_t):
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == BWN_FUNCS else AST_DISABLE_FOR_FORM
-
+        return AST_ENABLE_FOR_FORM if ctx.form_type == \
+            BWN_FUNCS else AST_DISABLE_FOR_FORM
 
 
 class Hooks(UI_Hooks):
@@ -111,7 +114,6 @@ class Hooks(UI_Hooks):
         elif get_tform_type(form) == BWN_FUNCS:
             attach_action_to_popup(form, popup, 'func:initial', 'JARVIS/')
             attach_action_to_popup(form, popup, 'func:final', 'JARVIS/')
-
 
 
 def install_ui_hooks():
@@ -157,7 +159,6 @@ def install_ui_hooks():
         195                         # Optional: icon (menus, toolbars)
     )
 
-
     # Register it (it does not appear in GUI yet)
     register_action(initial_desc)
     register_action(final_desc)
@@ -169,4 +170,3 @@ def install_ui_hooks():
     hooks = Hooks()
     if hooks.hook():
         print 'UI: Hook installed successfully'
-

@@ -4,10 +4,8 @@
 # Description: It hosts all GUI elements relevant to vulnerability detection
 #
 
-
 from PySide import QtGui, QtCore
 from PySide.QtGui import QIcon
-from PySide.QtGui import QTableWidgetItem
 
 from jarvis.widgets.CustomWidget import CustomWidget
 import jarvis.core.helpers.BinaryEntropy as BE
@@ -32,7 +30,6 @@ class FirmwareWidget(CustomWidget):
 
         self._createGui()
 
-
     def _createGui(self):
 
         self._createToolBar('Firmware')
@@ -49,7 +46,6 @@ class FirmwareWidget(CustomWidget):
         self.splitter.addWidget(self.table)
         self.splitter.addWidget(self.output_label)
         self.splitter.addWidget(self.output_window)
-
 
     def _createEntropyGraph(self):
         """
@@ -82,7 +78,6 @@ class FirmwareWidget(CustomWidget):
 
         self.image_label = QtGui.QLabel('Entropy Graph')
 
-
     def _getPos(self, event):
         """
         Gets the (x, y) position from
@@ -92,7 +87,6 @@ class FirmwareWidget(CustomWidget):
         y = event.pos().y()
 
         print "(%d, %d)" % (x, y)
-
 
     def _createToolBarActions(self):
 
@@ -112,7 +106,6 @@ class FirmwareWidget(CustomWidget):
 
         self.toolbar.addAction(self.bannedAction)
         self.toolbar.addAction(self.integerAction)
-
 
     #################################################################
     # GUI Callbacks

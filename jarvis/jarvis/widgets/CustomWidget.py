@@ -33,7 +33,6 @@ class CustomWidget(QtGui.QMainWindow):
 
         self._createLayout()
 
-
     def _createGui(self):
         """
         Subclasses must override this
@@ -45,7 +44,6 @@ class CustomWidget(QtGui.QMainWindow):
         """
         raise NotImplementedError
 
-
     def _createToolBar(self, name):
         """
         Subclasses need to define the
@@ -53,7 +51,6 @@ class CustomWidget(QtGui.QMainWindow):
         """
         self.toolbar = self.addToolBar(name)
         self.toolbar.setMovable(False)
-
 
     def _createLayout(self):
         """
@@ -84,7 +81,6 @@ class CustomWidget(QtGui.QMainWindow):
         main_layout.addLayout(output_layout)
         self.central_widget.setLayout(main_layout)
 
-
     def _createOutputWindow(self):
         """
         Some binary analysis commands will output to this.
@@ -97,7 +93,6 @@ class CustomWidget(QtGui.QMainWindow):
         self.output_window.setReadOnly(True)
         # Save it for later use
         self.output_window.original_textcolor = self.output_window.textColor()
-
 
     def _createOutputTable(self):
         """
@@ -116,9 +111,9 @@ class CustomWidget(QtGui.QMainWindow):
 
         # Connect signals to slots
         self.table.customContextMenuRequested.connect(self._tablePopup)
-        self.table.horizontalHeader().sectionDoubleClicked.connect(self._tableHeaderDoubleClicked)
+        self.table.horizontalHeader().sectionDoubleClicked.connect(
+            self._tableHeaderDoubleClicked)
         self.table.cellDoubleClicked.connect(self._tableCellDoubleClicked)
-
 
     def _createOutputTree(self):
         """
@@ -136,8 +131,6 @@ class CustomWidget(QtGui.QMainWindow):
         # Connect signals to slots
         self.tree.itemDoubleClicked.connect(self._treeElementDoubleClicked)
 
-
-
     #################################################################
     # GUI Callbacks
     #################################################################
@@ -151,11 +144,11 @@ class CustomWidget(QtGui.QMainWindow):
             self.output_window.setTextColor(err_color)
             self.output_window.append(s)
             # restore original color
-            self.output_window.setTextColor(self.output_window.original_textcolor)
+            self.output_window.setTextColor(
+                self.output_window.original_textcolor)
 
         else:
             self.output_window.append(s)
-
 
     def _tableCellDoubleClicked(self, row, col):
         """
@@ -172,7 +165,6 @@ class CustomWidget(QtGui.QMainWindow):
             self._console_output("[!] That does not look like an address...", err = True)
             return
 
-
     def _tablePopup(self, pos):
         """
         Popup menu activated clicking the secondary
@@ -182,10 +174,13 @@ class CustomWidget(QtGui.QMainWindow):
 
         # Add menu entries
         delRow = menu.addAction(QIcon(self.iconp + "close.png"), "Delete Row")
-        selItem = menu.addAction(QIcon(self.iconp + "bookmark.png"), "Mark entry")
+        selItem = menu.addAction(
+            QIcon(self.iconp + "bookmark.png"), "Mark entry")
         menu.addSeparator()
-        origFunc = menu.addAction(QIcon(self.iconp + "lightning.png"), "Select origin function")
-        destFunc = menu.addAction(QIcon(self.iconp + "flag.png"), "Select destination function")
+        origFunc = menu.addAction(
+            QIcon(self.iconp + "lightning.png"), "Select origin function")
+        destFunc = menu.addAction(
+            QIcon(self.iconp + "flag.png"), "Select destination function")
 
         # Get entry clicked
         action = menu.exec_(self.mapToGlobal(pos))
@@ -213,13 +208,11 @@ class CustomWidget(QtGui.QMainWindow):
             except:
                 self._console_output("This does not look like an address...", err = True)
 
-
     def _tableHeaderDoubleClicked(self, index):
         """
         Used to sort the contents
         """
         self.table.sortItems(index, order = QtCore.Qt.AscendingOrder)
-
 
     def _treeElementDoubleClicked(self, item, column):
         """

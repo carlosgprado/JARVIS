@@ -11,7 +11,6 @@ from idautils import *
 from collections import defaultdict
 import traceback
 import re
-import string
 import math
 
 
@@ -97,7 +96,8 @@ def is_external_jmp(ins_ea):
     True for JMPs between functions.
     NN_JMP (86): jmp sub_xxx (0xE9 + offset) or jmp loc_xxx (0xE9 + offset)
     NN_JMPNI (88): jmp __imp_Writefile (0xFF25 + address in .idata)
-    These appear unfortunately in loops as well (jmp ds:dwordxxx[eax*4] or alike)K
+    These appear unfortunately in loops as well:
+    (jmp ds:dwordxxx[eax*4] or alike)K
     """
     # TODO: Check if this is accurate (unit tests? :))
 
@@ -267,7 +267,6 @@ class importManager():
         self.import_dict = {}
         self._enum_all_imports()
 
-
     def find_import_callers(self, regexp):
         """
         Finds interesting imported functions and the nodes that call them.
@@ -286,7 +285,8 @@ class importManager():
 
         for imp_name, imp_ea in self.import_dict.iteritems():
 
-            # This dict has the *IAT names* (i.e. __imp_ReadFile, within the .idata section)
+            # This dict has the *IAT names*
+            # i.e. __imp_ReadFile, within the .idata section
             if importPattern.match(imp_name):
 
                 for import_caller in XrefsTo(imp_ea, 1):
@@ -320,14 +320,13 @@ class importManager():
 
         return importCallers
 
-
     def _enum_all_imports(self):
         """
         Useful afterwards for resolving addresses to imports.
-        Following code has been taken shamelessly from the "ex_imports.py" distribution example :)
+        This code has been taken shamelessly from the "ex_imports.py" example.
 
         @rtype: dictionary
-        @return: dictionary containing import name & address { "name" : imp_ea }
+        @return: dictionary containing import name & address {"name" : imp_ea}
         """
         print "= [*] Populating imports dictionary..."
 
@@ -345,7 +344,6 @@ class importManager():
 
         return self.import_dict
 
-
     def _imp_cb(self, ea, name, ord):
         """
         Used by _enum_all_imports.
@@ -361,7 +359,6 @@ class importManager():
             self.import_dict[name] = ea
 
         return True
-
 
     def _find_import_name(self, iaddr):
         """

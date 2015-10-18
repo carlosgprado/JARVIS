@@ -1,0 +1,287 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"hash",
+				"hashlib	module"
+			],
+			[
+				"has",
+				"hashlib	module"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "#!/usr/bin/python\n#\n# Name: BinaryAnalysisWidget.py\n# Description: It hosts all GUI elements relevant to vulnerability detection\n#\n\n\nfrom PySide import QtGui, QtCore\nfrom PySide.QtGui import QIcon\nfrom PySide.QtGui import QTableWidgetItem, QTreeWidgetItem\n\nimport jarvis.widgets.CustomWidget as cw\nimport jarvis.core.helpers.Misc as misc\nfrom jarvis.core.helpers.InfoUI import InfoUI\n\n\n#################################################################\nclass BinaryAnalysisWidget(cw.CustomWidget):\n\n    def __init__(self, parent = None):\n        \"\"\"\n        Constructor\n        \"\"\"\n        cw.CustomWidget.__init__(self)\n        self.name = \"Binary analysis\"\n        self.parent = parent\n        self.config = self.parent.config\n        self.icon = QIcon(self.iconp + 'binary_analysis.png')\n\n        # Functionality associated with this widget\n        self.ba = parent.binary_analysis\n        QtCore.QTextCodec.setCodecForCStrings(\n            QtCore.QTextCodec.codecForName(\"UTF-8\"))\n\n        self._createGui()\n\n    def _createGui(self):\n\n        self._createToolBar('Binary')\n        self._createToolBarActions()\n        self._createOutputWindow()\n        self._createOutputTable()\n        self._createOutputTree()\n\n        # Output Layout\n        self.splitter.addWidget(self.table_label)\n        self.splitter.addWidget(self.table)\n        self.splitter.addWidget(self.tree_label)\n        self.splitter.addWidget(self.tree)\n        self.splitter.addWidget(self.output_label)\n        self.splitter.addWidget(self.output_window)\n\n    def _createToolBarActions(self):\n\n        self.mostRefAction = QtGui.QAction(\n                QIcon(self.iconp + 'most_ref.png'),\n                '&Show most referenced functions',\n                self,\n                triggered = self._showMostReferenced\n                )\n\n        self.immCmpsAction = QtGui.QAction(\n                QIcon(self.iconp + 'mark_imm_cmps.png'),\n                '&Mark immediate compares within the current function. \\\n                Useful with parsers',\n                self,\n                triggered = self._markImmCompares\n                )\n\n        self.dwCmpsAction = QtGui.QAction(\n                QIcon(self.iconp + 'globals_cmp_imm.png'),\n                '&Search for global variables being compared \\\n                to immediate values',\n                self,\n                triggered = self._showDwordCompares\n                )\n\n        self.callsAction = QtGui.QAction(\n                QIcon(self.iconp + 'graph_curr_function.png'),\n                '&Show calls within the current function',\n                self,\n                triggered = self._callsInThisFunction\n                )\n\n        self.commsAction = QtGui.QAction(\n                QIcon(self.iconp + 'comments_curr_function.png'),\n                '&Show IDA generated comments within the current function',\n                self,\n                triggered = self._commentsInThisFunction\n                )\n\n        self.stringsAction = QtGui.QAction(\n                QIcon(self.iconp + 'strings_curr_function.png'),\n                '&Search references to strings within the current function',\n                self,\n                triggered = self._showStringXrefs\n                )\n\n        self.inputsAction = QtGui.QAction(\n                QIcon(self.iconp + 'io_connecting_to.png'),\n                '&Locate IO connecting to current function. CPU intensive!',\n                self,\n                triggered = self._showConnectedIO\n                )\n\n        self.allFuncsAction = QtGui.QAction(\n                QIcon(self.iconp + 'function_list.png'),\n                '&Display function list for the connect graph',\n                self,\n                triggered = self._showAllFunctions\n                )\n\n        self.connGraphAction = QtGui.QAction(\n                QIcon(self.iconp + 'show_connect_graph.png'),\n                '&Shows the connect graph',\n                self,\n                triggered = self._showConnectionGraph\n                )\n\n        self.dangConnAction = QtGui.QAction(\n                QIcon(self.iconp + 'connect_io_danger.png'),\n                '&Shows all connections between IO input and dangerous \\\n                functions (CPU intensive!)',\n                self,\n                triggered = self._showDangerousConnections\n                )\n\n        self.bbConnAction = QtGui.QAction(\n                QIcon(self.iconp + 'connect_bb.png'),\n                '&Shows all connections between selected basic blocks',\n                self,\n                triggered = self._showConnectedBBs\n                )\n\n        self.xorAction = QtGui.QAction(\n                QIcon(self.iconp + 'xor_bytes.png'),\n                '&XOR the selected bytes with a single byte',\n                self,\n                triggered = self._xorSelection\n                )\n\n        self.toolbar.addAction(self.mostRefAction)\n        self.toolbar.addAction(self.dwCmpsAction)\n        self.toolbar.addSeparator()\n        self.toolbar.addAction(self.immCmpsAction)\n        self.toolbar.addAction(self.callsAction)\n        self.toolbar.addAction(self.commsAction)\n        self.toolbar.addAction(self.stringsAction)\n        self.toolbar.addSeparator()\n        self.toolbar.addAction(self.inputsAction)\n        self.toolbar.addAction(self.allFuncsAction)\n        self.toolbar.addAction(self.connGraphAction)\n        self.toolbar.addAction(self.dangConnAction)\n        self.toolbar.addAction(self.bbConnAction)\n        self.toolbar.addSeparator()\n        self.toolbar.addAction(self.xorAction)\n\n    #################################################################\n    # GUI Callbacks\n    #################################################################\n    def _showMostReferenced(self):\n        \"\"\"\n        Shows the most referenced functions.\n        \"\"\"\n        self._console_output(\"Calculating most referenced functions...\")\n        self.table_label.setText(\"Most referenced functions\")\n\n        most_referenced = self.ba.most_referenced_functions()\n\n        self.table.setColumnCount(3)\n        self.table.setHorizontalHeaderLabels((\"Address\", \"References\", \"Name\"))\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        idx = 0\n\n        # Fill with contents\n        for f_ea, (ref_nr, ref_name) in most_referenced:\n\n            self.table.insertRow(idx)\n            addr_item = QTableWidgetItem(\"%x\" % f_ea)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            ref_item = cw.NumQTableWidgetItem(\"%d\" % ref_nr)\n            name_item = QTableWidgetItem(ref_name)\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, ref_item)\n            self.table.setItem(idx, 2, name_item)\n\n            idx += 1\n\n    def _markImmCompares(self):\n        \"\"\"\n        Marks the immediate compares within the current function\n        \"\"\"\n        self.output_window.append(\"Marking all immediate compares...\")\n        self.table_label.setText(\"Immediate compares within current function\")\n\n        INS_COLOR = 0x2020c0\n\n        self.table.setColumnCount(2)\n        self.table.setHorizontalHeaderLabels((\"Address\", \"Disassembly\"))\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        idx = 0\n        for cmp_ea, dis in self.ba.find_imm_compares():\n\n            self.table.insertRow(idx)\n\n            addr_item = QTableWidgetItem(\"%x\" % cmp_ea)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            dis_item = cw.NumQTableWidgetItem(\"%s\" % dis)\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, dis_item)\n\n            misc.set_ins_color(cmp_ea, INS_COLOR)\n            idx += 1\n\n    def _callsInThisFunction(self):\n        \"\"\"\n        Shows all calls within the current function\n        \"\"\"\n        msg = \"Calls within function '\" + misc.get_function_name()\n        self._console_output(msg)\n\n        show_unique_calls = self.config.display_unique_calls\n        callee_list = self.ba.calls_in_function()\n\n        nrows = len(callee_list)\n        if not nrows:\n            self._console_output(\"[!] No calls found\", err = True)\n            return\n\n        self.table_label.setText(\"Calls within current function\")\n        self.table.setColumnCount(2)\n        self.table.setHorizontalHeaderLabels((\"Address\", \"Callee\"))\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        # Fill with contents\n        shown_calls = []\n\n        idx = 0\n        for (addr, callee) in callee_list:\n\n            if show_unique_calls and callee in shown_calls:\n                continue\n\n            shown_calls.append(callee)\n\n            self.table.insertRow(idx)\n            addr_item = QTableWidgetItem(\"%08x\" % addr)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            callee_item = QTableWidgetItem(callee)\n            callee_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, callee_item)\n\n            idx += 1\n\n    def _commentsInThisFunction(self):\n        \"\"\"\n        Shows all comments within the current function\n        \"\"\"\n        show_unique_c = self.config.display_unique_comments\n\n        msg = \"Searching comments within function '\" + \\\n            misc.get_function_name() + \"'\"\n        self._console_output(msg)\n\n        comment_list = self.ba.comments_in_function()\n\n        # Found any comment at all?\n        nrows = len(comment_list)\n        if not nrows:\n            self._console_output(\"[!] No comments found\", err = True)\n            return\n\n        self.table.setColumnCount(2)\n        self.table_label.setText(\"Comments within current function\")\n        self.table.setHorizontalHeaderLabels((\"Address\", \"Comments\"))\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        # Fill with contents\n        displayed_comments = []\n\n        idx = 0\n        for (addr, comment) in comment_list:\n            if show_unique_c and comment in displayed_comments:\n                continue\n\n            displayed_comments.append(comment)\n\n            self.table.insertRow(idx)\n            addr_item = QTableWidgetItem(\"%08x\" % addr)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            comment_item = QTableWidgetItem(comment)\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, comment_item)\n\n            idx += 1\n\n    def _showStringXrefs(self):\n        \"\"\"\n        Displays string references in a table\n        Optionally Shannon's misc.entropy as well\n        \"\"\"\n\n        # Retrieve some config values\n        show_misc_entropy = self.config.calculate_entropy\n        show_unique_s = self.config.display_unique_strings\n\n        self._console_output(\"Calculating string references...\")\n\n        self.ba.calculate_strings_list()\n        s_ref_list = self.ba.get_string_references()\n\n        # Found any references at all?\n        nrows = len(s_ref_list)\n        if not nrows:\n            self._console_output(\"[!] No string references found\", err = True)\n            return\n\n        if show_misc_entropy:\n            self.table.setColumnCount(3)\n            self.table.setHorizontalHeaderLabels((\"Address\", \"String\", \"Entropy\"))\n\n        else:\n            self.table.setColumnCount(2)\n            self.table.setHorizontalHeaderLabels((\"Address\", \"String\"))\n\n        self.table_label.setText(\"String references in current function\")\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        # Fill the table\n        displayed_strings = []\n\n        idx = 0\n        for (addr, s) in s_ref_list:\n            if show_unique_s and s in displayed_strings:\n                continue\n\n            displayed_strings.append(s)\n\n            self.table.insertRow(idx)\n            addr_item = QTableWidgetItem(\"%08x\" % addr)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            string_item = QTableWidgetItem(s.decode('utf-8'))\n            string_item.setFlags(string_item.flags() ^ QtCore.Qt.ItemIsEditable)\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, string_item)\n\n            if show_misc_entropy:\n                misc_entropy_item = cw.NumQTableWidgetItem(\"%.4f\" % misc.entropy(s))\n                self.table.setItem(idx, 2, misc_entropy_item)\n\n            idx += 1\n\n    def _showDwordCompares(self):\n        \"\"\"\n        Inspects the *whole* binary looking for comparisons between\n        global dwords and immediate values. These usually contain error\n        codes or alike and appear constantly through the code.\n        \"\"\"\n\n        self._console_output(\"Looking for Dword compares...\")\n        self.tree_label.setText(\"Dword immediate compares\")\n\n        dw_dict = self.ba.get_dword_compares()\n\n        # Fill the tree with items\n        self.tree.setHeaderLabels((\"Dword\", \"Values\", \"Address\"))\n\n        for dw, values in dw_dict.iteritems():\n            dw_item = QTreeWidgetItem(self.tree)\n            dw_item.setText(0, dw)\n\n            for value, addr in values:\n                value_item = QTreeWidgetItem(dw_item)\n                value_item.setText(1, value)\n                value_item.setText(2, \"%x\" %addr)\n\n        # Display all items expanded initially\n        self.tree.expandAll()\n\n\n    def _showAllFunctions(self):\n        \"\"\"\n        Populates the functions list.\n        From this it is possible to select endpoints to\n        create a ConnectGraph for example\n        \"\"\"\n        self._console_output(\"Displaying all known functions...\")\n\n        current_ea, _ = misc.function_boundaries()\n\n        func_list = self.ba.get_all_functions()\n        if not func_list:\n            return\n\n        self.table.setColumnCount(2)\n        self.table.setHorizontalHeaderLabels((\"Address\", \"Name\"))\n\n        self.table_label.setText(\"Functions in current binary\")\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        # Current table index\n        c_idx = 0\n\n        for idx, (f_ea, f_name) in enumerate(func_list):\n            self.table.insertRow(idx)\n\n            addr_item = QTableWidgetItem(\"%08x\" % f_ea)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            name_item = QTableWidgetItem(\"%s\" % f_name)\n\n            if f_ea == current_ea:\n                current_ea_item = addr_item\n                c_idx = idx\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, name_item)\n\n        # Conveniently scroll to the current EA\n        self.table.scrollToItem(\n            #current_ea_item,\n            self.table.item(c_idx, 0),\n            QtGui.QAbstractItemView.PositionAtTop\n            )\n\n\n    def _showConnectionGraph(self):\n        \"\"\"\n        Creates and shows a ConnectGraph between orig and dest.\n        \"\"\"\n        self._console_output(\"Creating connect graph...\")\n        res = True\n\n        try:\n            u = InfoUI.function_orig_ea\n            v = InfoUI.function_dest_ea\n\n        except:\n            self._console_output(\"[!] You must select the corresponding functions\", err = True)\n\n        cg = self.ba.get_connect_graph(u, v)\n        res = self.ba.show_connect_graph(cg)\n\n        if not res:\n            self._console_output(\n                \"[x] No connection between %08x and %08x\" % (u, v),\n                err = True)\n\n\n    def _showConnectedIO(self):\n        \"\"\"\n        Shows a list of functions dealing with IO and\n        connected to the current function\n        \"\"\"\n        self._console_output(\"Calculating file & network IO...\")\n        io_list = self.ba.input_to_function()\n\n        if not io_list:\n            self._console_output(\"[!] No (obvious) IO connecting to this function\", err = True)\n            return\n\n        self.table.setColumnCount(2)\n        self.table.setHorizontalHeaderLabels((\"Caller\", \"Name\"))\n\n        self.table_label.setText(\"Connected IO\")\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        for idx, caller in enumerate(io_list):\n            self.table.insertRow(idx)\n\n            addr_item = QTableWidgetItem(\"%08x\" % caller)\n            addr_item.setFlags(addr_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            name_item = QTableWidgetItem(\"%s\" % misc.get_function_name(caller))\n\n            self.table.setItem(idx, 0, addr_item)\n            self.table.setItem(idx, 1, name_item)\n\n\n    def _showDangerousConnections(self):\n        \"\"\"\n        Shows connections graphs between functions calling IO\n        and the ones calling dangerous APIs\n        \"\"\"\n        self._console_output(\"Calculating dangerous connections...\")\n        conn_graphs = self.ba.get_all_dangerous_connections()\n\n        if not conn_graphs:\n            self._console_output(\"[!] No (obvious) dangerous connections\", err = True)\n            return\n\n        self.table.setColumnCount(5)\n        self.table.setHorizontalHeaderLabels((\"IO Caller\", \"Dangerous Functions\", \"Shortest Path Length\", \"u\", \"v\"))\n\n        self.table_label.setText(\"Dangerous Connections\")\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        for idx, c in enumerate(conn_graphs):\n            self.table.insertRow(idx)\n\n            u, v, sp_len = c    # tuple unpacking\n            io_item = QTableWidgetItem(\"%s\" % misc.get_function_name(u))\n            df_item = QTableWidgetItem(\"%s\" % misc.get_function_name(v))\n            sp_item = QTableWidgetItem(\"%d\" % sp_len)\n            ioa_item = QTableWidgetItem(\"%x\" % u)\n            ioa_item.setFlags(ioa_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            dfa_item = QTableWidgetItem(\"%x\" % v)\n            dfa_item.setFlags(dfa_item.flags() ^ QtCore.Qt.ItemIsEditable)\n\n            self.table.setItem(idx, 0, io_item)\n            self.table.setItem(idx, 1, df_item)\n            self.table.setItem(idx, 2, sp_item)\n            self.table.setItem(idx, 3, ioa_item)\n            self.table.setItem(idx, 4, dfa_item)\n\n\n    def _showConnectedBBs(self):\n        \"\"\"\n        Shows a list of paths between selected basic blocks\n        \"\"\"\n        self._console_output(\"Calculating paths between basic blocks...\")\n        bb_paths = self.ba.get_bb_connect_graph(self.config.connect_bb_cutoff)\n\n        if not bb_paths:\n            self._console_output(\"[!] Could not find paths between basic blocks\", err = True)\n            return\n\n        self.table.setColumnCount(2)\n        self.table.setHorizontalHeaderLabels((\"Path ID\", \"Length\"))\n\n        # Override the default double click callback\n        self.table.cellDoubleClicked.connect(self._bbTableDoubleClicked)\n\n        self.table_label.setText(\"Paths between Basic Blocks\")\n        self.table.clearContents()\n        self.table.setRowCount(0)\n\n        bb_paths_l = list(bb_paths) # To reference by index :)\n\n        if len(bb_paths_l) == 0:\n            self._console_output(\"[!] Could not find paths. Try increasing cutoff under Options\", err = True)\n            return\n\n        for idx, path in enumerate(bb_paths_l):\n            self.table.insertRow(idx)\n\n            path_item = QTableWidgetItem(\"%d\" % idx)\n            path_item.setFlags(path_item.flags() ^ QtCore.Qt.ItemIsEditable)\n            len_item = cw.NumQTableWidgetItem(\"%d\" % len(path))\n            len_item.setFlags(len_item.flags() ^ QtCore.Qt.ItemIsEditable)\n\n            self.table.setItem(idx, 0, path_item)\n            self.table.setItem(idx, 1, len_item)\n\n        # Cache this\n        self.ba.cache.bb_paths = bb_paths_l\n\n\n    def _bbTableDoubleClicked(self, row, col):\n        \"\"\"\n        This overrides the callback for table's double click\n        set in the CustomWidget object.\n        Apparently if there is an exception it falls back to\n        the original callback... Not sure why this behaviour.\n        NOTE: This is kind of nasty.\n        :return: None\n        \"\"\"\n        it = self.table.item(row, col).text()\n\n        try:\n            idx = int(it)   # decimal\n            bb_path = self.ba.cache.bb_paths[idx]\n\n            col = QtGui.QColorDialog.getColor()\n            if col.isValid():\n                # IDA works with BGR (annoying)\n                ida_color = misc.pyside_to_ida_color(col.name())\n                misc.paint_basic_blocks(bb_path, ida_color)\n\n            else:\n                print '[x] Invalid QColor'\n\n            return\n\n        except IndexError:\n            # Address value (does not contain [A-F]) is interpreted as index\n            return\n\n        except ValueError:\n            # Address value (containing [A-F]) fucks up int()\n            return\n\n\n    def _xorSelection(self):\n        \"\"\"\n        It XORs the selected bytes with a single-byte key\n        WARNING: it can brick your IDB!!!1!\n        \"\"\"\n\n        self._console_output(\"XOR'ing selected bytes...\")\n        self.ba.xor_patcher()\n\n",
+			"file": "jarvis/jarvis/widgets/BinaryAnalysisWidget.py",
+			"file_size": 20858,
+			"file_write_time": 130896450740000000,
+			"settings":
+			{
+				"buffer_size": 20857,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 316.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"pack",
+				"Preferences: Browse Packages"
+			],
+			[
+				"anacfind",
+				"Anaconda: Find object usage"
+			],
+			[
+				"anacgot",
+				"Anaconda: Goto object definition"
+			],
+			[
+				"synpy",
+				"Set Syntax: Python"
+			],
+			[
+				"packins",
+				"Package Control: Install Package"
+			],
+			[
+				"anacdoc",
+				"Anaconda: Display object docs"
+			],
+			[
+				"ana",
+				"Anaconda: Display object docs"
+			],
+			[
+				"anadoc",
+				"Anaconda: Display object docs"
+			],
+			[
+				"pref",
+				"Preferences: Browse Packages"
+			],
+			[
+				"packlis",
+				"Package Control: List Packages"
+			],
+			[
+				"prefere",
+				"Preferences: Settings - User"
+			],
+			[
+				"packlist",
+				"Package Control: List Packages"
+			],
+			[
+				"packinsta",
+				"Package Control: Install Package"
+			],
+			[
+				"packains",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 417.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis/jarvis",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis/jarvis/widgets"
+	],
+	"file_history":
+	[
+		"/Users/carlos/Library/Application Support/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/PinTracer/pintracer/process_json_traces.py",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis/jarvis/Config.py",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis/jarvis.py",
+		"/Users/carlos/GoogleDrive/c0de/GitRepos/JARVIS/jarvis_launcher.py",
+		"/Users/carlos/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/carlos/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings",
+		"/Users/carlos/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"FirmwareWidget"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "jarvis/jarvis/widgets/BinaryAnalysisWidget.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20857,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10487,
+								10490
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5038.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "jarvis.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

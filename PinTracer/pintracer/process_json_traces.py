@@ -15,6 +15,7 @@ j_green = rebase_trace(j_green, 0x500000)
 j, k = rebase_traces(j_red, j_green)
 """
 
+
 def load_trace_from_file(filename):
     """
     Convenience wrapper.
@@ -32,7 +33,7 @@ def load_trace_from_file(filename):
 def write_trace_to_file(filename, j_obj):
     """
     Convenience wrapper.
-    Writes the serialized JSON object 
+    Writes the serialized JSON object
     to a file on disk
     @param filename: filename, dough!
     @param j_obj: the JSON object

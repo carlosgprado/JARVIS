@@ -24,4 +24,3 @@ def get_number_of_args(call_addr):
     if not is_call_insn(call_addr):
         raise Exception('Address does NOT belong to CALL instruction')
 
-

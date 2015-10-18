@@ -5,7 +5,6 @@
 # of the binary's entropy
 #
 
-
 from idc import *
 from idaapi import *
 from idautils import *
@@ -31,7 +30,6 @@ class BinaryEntropy():
         self.scaled_values = [0] * (self.image_width * self.image_height)
         self.tile_size = 0
 
-
     def get_block_size(self):
         """
         The block size is a function of
@@ -44,7 +42,6 @@ class BinaryEntropy():
         block_size = bin_size / self.nr_cells
 
         return block_size
-
 
     def calculate_entropy(self):
         """
@@ -75,7 +72,6 @@ class BinaryEntropy():
                     print "[!] Between %08x - %08x" % (block_start, block_start + block_size)
                     self.entropy_d[idx] = 3
 
-
     #################################################################
     # Auxiliary
     #################################################################
@@ -97,7 +93,6 @@ class BinaryEntropy():
             # Remember, we need strings
             adjusted_entropy_s = struct.pack('>I', adjusted_entropy)
             self.entropy_d[idx] = adjusted_entropy_s
-
 
     def cheap_scale(self):
         """
@@ -133,7 +128,6 @@ class BinaryEntropy():
             for k in xrange(tile_size):
                 for l in xrange(tile_size):
                     self.scaled_values[p + k + (l * self.image_width)] = ev[idx]
-
 
     def get_chunk_from_pos(self, x, y):
         """

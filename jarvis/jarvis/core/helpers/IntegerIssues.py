@@ -15,7 +15,7 @@ from jarvis.core.helpers.Graphing import BlockGraph
 import jarvis.core.helpers.Misc as misc
 
 
-####################################################################################
+##############################################################################
 class IntegerIssues():
 
     def __init__(self):
@@ -35,7 +35,6 @@ class IntegerIssues():
                               'wcscpy': 2,
                               'wcsncpy': 3,
                               }
-
 
     def called_dangerous_funcs(self):
         """
@@ -62,7 +61,6 @@ class IntegerIssues():
                         SetColor(ref.frm, CIC_ITEM, 0x2020c0)
 
                     break
-
 
     def get_dangerous_args(self, ea):
         """
@@ -104,7 +102,6 @@ class IntegerIssues():
 
         return dang_args
 
-
     def get_signed_cmp(self, dangerous_ea):
         """
         Find the signed compare before the dangerous call
@@ -145,7 +142,6 @@ class IntegerIssues():
 
         return None
 
-
     def search_integer_issues(self):
         """
         Searches the *whole* binary for integer issues, like signed
@@ -181,4 +177,3 @@ class IntegerIssues():
                     suspicious_ins_list.append(dang_call_ea)
 
         return suspicious_ins_list
-

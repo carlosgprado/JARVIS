@@ -11,7 +11,6 @@ from idaapi import *
 from idautils import *
 
 
-
 class patched_bytes_visitor(object):
     """
     Visits all patched bytes and modifies
@@ -72,4 +71,3 @@ def patch_binary():
         f.write(original_file_data)
 
     return patched_list
-

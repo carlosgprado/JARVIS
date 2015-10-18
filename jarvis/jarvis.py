@@ -4,11 +4,6 @@
 # Description: This is the MAIN FILE for IDA's jarvis plugin
 #
 
-__VERSION__ = 0.6
-
-# Nasty workaround
-IS_NEW_IDA = True
-
 from idc import *
 from idautils import *
 from idaapi import *
@@ -29,6 +24,10 @@ from jarvis.widgets.ScratchPadWidget import ScratchPadWidget
 from jarvis.widgets.OptionsWidget import OptionsWidget
 from jarvis.widgets.FirmwareWidget import FirmwareWidget
 
+__VERSION__ = 0.7
+
+# Nasty workaround
+IS_NEW_IDA = True
 
 try:
     from jarvis.core.helpers.UI import install_ui_hooks
@@ -53,7 +52,6 @@ class JarvisPluginForm(PluginForm):
         self.config = JConfig()
         self.iconp = self.config.icons_path
 
-
     def showBanner(self):
         """
         Old school is cool
@@ -64,7 +62,6 @@ class JarvisPluginForm(PluginForm):
                 )
 
         print banner
-
 
     def OnCreate(self, form):
         """
@@ -78,7 +75,6 @@ class JarvisPluginForm(PluginForm):
         self.setupWidgets()
         self.setupUI()
 
-
     def setupCore(self):
         """
         Initializes all internal functionality
@@ -88,7 +84,6 @@ class JarvisPluginForm(PluginForm):
         self.binary_analysis = BinaryAnalysis()
         self.vuln_detection = VulnDetection()
         self.import_export = ImportExport()
-
 
     def setupWidgets(self):
         """
@@ -102,11 +97,10 @@ class JarvisPluginForm(PluginForm):
         self.jarvisWidgets.append(VulnDetectionWidget(self))
         self.jarvisWidgets.append(ImportExportWidget(self))
         self.jarvisWidgets.append(ScratchPadWidget(self))
-        #self.jarvisWidgets.append(FirmwareWidget(self))
+        # self.jarvisWidgets.append(FirmwareWidget(self))
         self.jarvisWidgets.append(OptionsWidget(self))
 
         self.setupJarvisForm()
-
 
     def setupJarvisForm(self):
         """
@@ -122,7 +116,6 @@ class JarvisPluginForm(PluginForm):
         layout.addWidget(self.tabs)
 
         self.parent.setLayout(layout)
-
 
     def setupUI(self):
         """
@@ -141,7 +134,6 @@ class JarvisPluginForm(PluginForm):
             print '[!] Some functionality has been deactivated (custom popup menus)'
             print '[!] Other problems are expected but a large portion of JARVIS should be usable'
 
-
     def Show(self):
         """
         Overload this method to specify form options
@@ -155,14 +147,12 @@ class JarvisPluginForm(PluginForm):
                 )
             )
 
-
     def OnClose(self, form):
         """
         Perform some cleanup here, if necessary
         """
         print "= [*] JarvisPluginForm closed"
         print "=============================================\n"
-
 
 
 #################################################################
@@ -180,11 +170,9 @@ class JarvisPlugin(plugin_t):
         self.icon_id = 0
         return PLUGIN_KEEP
 
-
     def run(self, arg = 0):
         f = JarvisPluginForm()
         f.Show()
-
 
     def term(self):
         idaapi.msg("[*] JarvisPlugin terminated")
@@ -196,7 +184,6 @@ def PLUGIN_ENTRY():
     Entry point for IDA
     """
     return JarvisPlugin()
-
 
 
 #################################################################
@@ -216,9 +203,7 @@ def main():
         # There is no instance yet
         JARVIS = JarvisPluginForm()
 
-
     JARVIS.Show()
-
 
 
 if __name__ == '__main__':

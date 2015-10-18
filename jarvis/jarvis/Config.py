@@ -5,6 +5,7 @@
 #
 import os
 
+
 class JConfig():
 
     def __init__(self):
@@ -27,7 +28,5 @@ class JConfig():
         self.connect_bb_cutoff = 20
         self.connect_func_cutoff = 12
 
-
         # Vulnerability analysis
         self.deep_dangerous_functions = True
-

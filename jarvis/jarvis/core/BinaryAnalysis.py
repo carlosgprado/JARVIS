@@ -9,13 +9,13 @@ from idc import *
 from idaapi import *
 from idautils import *
 
-import itertools # for islice()
+import itertools  # for islice()
 from collections import defaultdict
 
 import jarvis.core.helpers.Misc as misc
 import jarvis.core.helpers.Graphing as graphing
-
 from jarvis.Config import JConfig
+
 
 #################################################################
 class BinaryAnalysis():
@@ -31,7 +31,6 @@ class BinaryAnalysis():
         self.config = JConfig()
 
         print "= Loading binary analysis module..."
-
 
     def comments_in_function(self):
         """
@@ -49,7 +48,6 @@ class BinaryAnalysis():
 
         return comments
 
-
     def calls_in_function(self, unique = True):
         """
         Find calls within current function
@@ -65,7 +63,6 @@ class BinaryAnalysis():
                     callees.append((addr, dis))
 
         return callees
-
 
     def calculate_strings_list(self):
         """
@@ -85,7 +82,6 @@ class BinaryAnalysis():
 
                 except:
                     print "Error processing string at %x" % v.ea
-
 
     def get_string_references(self):
         """
@@ -115,7 +111,6 @@ class BinaryAnalysis():
 
         return s_refs
 
-
     def most_referenced_functions(self, number = 10):
         """
         Identifying these is an important first step
@@ -128,19 +123,20 @@ class BinaryAnalysis():
             referenceDict = dict()
 
             for funcAddr in Functions():
-                nr_of_refs = sum(1 for e in XrefsTo(funcAddr, True)) # stackoverflow ;)
+                # stackoverflow ;)
+                nr_of_refs = sum(1 for e in XrefsTo(funcAddr, True))
                 ref_name = GetFunctionName(funcAddr)
                 referenceDict[funcAddr] = (nr_of_refs, ref_name)
 
             # Let's order this stuff nicely
-            sd = sorted(referenceDict.iteritems(), reverse = True, key = lambda (k, v): (v[0], k))
-            top_ref_list = list(itertools.islice(sd, number)) # generator -> list
+            sd = sorted(referenceDict.iteritems(), reverse = True,
+                        key = lambda (k, v): (v[0], k))
+            top_ref_list = list(itertools.islice(sd, number))
 
             # Cache it for later use
             self.cache.top_ref_list = top_ref_list
 
             return top_ref_list
-
 
     def xor_patcher(self):
         """
@@ -171,7 +167,6 @@ class BinaryAnalysis():
 
         print "Patched %d bytes [%08x - %08x]" % (end - start + 1, start, end)
 
-
     def find_imm_compares(self):
         """
         Find all immediate compares in the current function.
@@ -182,11 +177,10 @@ class BinaryAnalysis():
 
         for addr, dis in misc.iter_disasm():
             if "cmp" in dis:
-                if GetOpType(addr, 1) == o_imm: # 5: immediate value
+                if GetOpType(addr, 1) == o_imm:  # 5: immediate value
                     cmp_addr.append((addr, dis))
 
         return cmp_addr
-
 
     def locate_file_io(self):
         """
@@ -195,7 +189,7 @@ class BinaryAnalysis():
         Call with interactive = True to display a custom viewer ;)
 
         @rtype: Dictionary (of lists)
-        @return: Dictionary containing the functions calling the imported functions,
+        @return: Dictionary of functions calling imported functions,
                  {fn_ea: [file_io1_ea, file_io2_ea, ...], ...}
         """
 
@@ -205,15 +199,14 @@ class BinaryAnalysis():
 
         return callerDict
 
-
     def locate_net_io(self):
         """
         Convenience function
-        Finds interesting network related *imports* and the functions calling them.
+        Finds interesting network related *imports* and functions calling them.
         Call with interactive = True to display a custom viewer ;)
 
         @rtype: Dictionary (of lists)
-        @return: Dictionary containing the functions calling the imported functions,
+        @return: Dictionary containing functions calling imported functions,
                  {fn_ea: [net_io1_ea, net_io2_ea, ...], ...}
         """
 
@@ -222,7 +215,6 @@ class BinaryAnalysis():
         callerDict = self.im.find_import_callers(regexp)
 
         return callerDict
-
 
     def get_dword_compares(self):
         """
@@ -237,8 +229,8 @@ class BinaryAnalysis():
             for ins in FuncItems(f_addr):
                 m = GetMnem(ins)
                 if m == 'cmp' or m == 'test':
-                    if GetOpType(ins, 1) == 5: # o_imm: immediate value
-                        if GetOpType(ins, 0) == 2: # o_mem: memory ;)
+                    if GetOpType(ins, 1) == 5:  # o_imm: immediate value
+                        if GetOpType(ins, 0) == 2:  # o_mem: memory ;)
                             op1, op2 = GetOpnd(ins, 0), GetOpnd(ins, 1)
                             if 'dword_' in op1:
                                 # ex: cmp dword_xxx, 1000
@@ -248,7 +240,6 @@ class BinaryAnalysis():
                                     dword_dict[op1].append((op2, ins))
 
         return dword_dict
-
 
     def get_all_functions(self):
         """
@@ -265,7 +256,6 @@ class BinaryAnalysis():
 
         return func_list
 
-
     def get_connect_graph(self, u, v):
         """
         Calculates a ConnectGraph from orig to dest
@@ -281,7 +271,6 @@ class BinaryAnalysis():
         else:
             return cg
 
-
     def show_connect_graph(self, cg = None):
         """
         Convenience method
@@ -294,7 +283,6 @@ class BinaryAnalysis():
 
         else:
             return False
-
 
     def input_to_function(self, ea = None):
         """
@@ -319,7 +307,6 @@ class BinaryAnalysis():
 
         return connected_input_list
 
-
     def get_dangerous_functions(self):
         """
         Gets a list of functions calling
@@ -327,10 +314,11 @@ class BinaryAnalysis():
         @returns: a *set* of func_addr's
         """
         # TODO: use a centralized list for the dangerous functions?
-        # TODO: this whole process must be O(mfg). It explodes with # of dangerous_funcs
+        # TODO: this whole process must be O(mfg).
         bad_funcs = set([])
 
-        dangerous_funcs = ["wcsncpy", "strcpy", "_strcpy", "_strcpy_0", "strncpy", "_strncpy", "_strncpy_0",
+        dangerous_funcs = ["wcsncpy", "strcpy", "_strcpy", "_strcpy_0",
+                           "strncpy", "_strncpy", "_strncpy_0",
                            "memmove", "memcpy", "_memcpy", "_memcpy_0"]
 
         # Loop from start to end within the current segment
@@ -346,7 +334,6 @@ class BinaryAnalysis():
                 bad_funcs.add(func_addr)
 
         return bad_funcs
-
 
     def get_all_dangerous_connections(self):
         """
@@ -382,7 +369,6 @@ class BinaryAnalysis():
 
         return conn_graphs
 
-
     def get_bb_connect_graph(self, co):
         """
         This is a thin wrapper.
@@ -408,4 +394,3 @@ class BinaryAnalysisCache():
         self.string_list = []
         self.top_ref_list = []
         self.bb_paths = []
-

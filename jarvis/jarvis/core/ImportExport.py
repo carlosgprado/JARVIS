@@ -2,7 +2,7 @@
 #
 # Name: ImportExport.py
 #
-# Description: Implements functions used to share information with other programs.
+# Description: Functions used to share information with other programs.
 #              This allows to add external information to our analysis as well.
 #
 
@@ -26,7 +26,6 @@ class ImportExport():
 
         self.ti = TraceImporter()
 
-
     def export_current_function(self):
         """
         Exports the current function code, ascii hex encoded
@@ -37,8 +36,10 @@ class ImportExport():
         begin, end = misc.function_boundaries()
 
         try:
-            filename = AskFile(1, "function_bytes.txt", "File to save the code?")
-            code_s = ''.join(["%02x" % get_byte(x) for x in xrange(begin, end)])
+            filename = AskFile(1, "function_bytes.txt",
+                               "File to save the code?")
+            code_s = ''.join([
+                "%02x" % get_byte(x) for x in xrange(begin, end)])
             with open(filename, 'w') as f:
                 f.write(code_s)
 
@@ -46,7 +47,6 @@ class ImportExport():
 
         except:
             return False
-
 
 
 class TraceImporter():
@@ -58,7 +58,6 @@ class TraceImporter():
         """
         print "= Loading TraceImporter..."
         self.cache = TraceImporterCache()
-
 
     def get_image_base(self, filename):
         """
@@ -75,14 +74,13 @@ class TraceImporter():
 
         return None
 
-
     def file_parser(self, filename):
         """
         Read trace addresses from a JSON file
-        Format: "calls" : [{"tid": 0, "u": 0xcafe, "v": 0xbabe, "indirect": true}, ...]
+        Format:
+        "calls" : [{"tid": 0, "u": 0xcafe, "v": 0xbabe, "indirect": true}, ...]
         @return: d[thread_id] = [(u_ea, v_ea), ...]
         """
-
         print "[*] Parsing file:", filename
         trace_d = defaultdict(list)
 
@@ -104,7 +102,6 @@ class TraceImporter():
         self.cache.trace_d = trace_d
 
         return trace_d
-
 
     def import_data(self, bb_color = 0x581414):
         """
@@ -135,7 +132,6 @@ class TraceImporter():
                 misc.paint_basic_blocks(v_ea, bb_color)
 
         return trace_dict
-
 
     def import_dynamic_calls(self):
         """
@@ -180,7 +176,6 @@ class TraceImporter():
                 # TODO: Display the imported info in a table format?
                 print "Added CodeXrefs from {} to {}".format(hex(frm), hex(to))
 
-
     def export_to_graphml(self):
         """
         GraphML is nice. Display with yed and enjoy.
@@ -208,7 +203,6 @@ class TraceImporter():
         return graphing.write_to_graphml(edge_list, filename)
 
 
-
 ##################################################################
 class TraceImporterCache():
     """
@@ -217,4 +211,3 @@ class TraceImporterCache():
     """
     def __init__(self):
         self.trace_d = dict()
-

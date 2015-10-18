@@ -28,7 +28,6 @@ class ScratchPadWidget(QtGui.QWidget):
 
         self._createGui()
 
-
     def _createGui(self):
 
         self._createScratchPadWindow()
@@ -46,7 +45,6 @@ class ScratchPadWidget(QtGui.QWidget):
         save_btn.clicked.connect(self._saveButtonClicked)
         self.setLayout(scratchpad_layout)
 
-
     def _createScratchPadWindow(self):
         """
         Some binary analysis commands will output to this.
@@ -54,9 +52,9 @@ class ScratchPadWidget(QtGui.QWidget):
         self.scratchpad_window = QTextEdit()
         self.scratchpad_window.setFontPointSize(9)
 
-
     #################################################################
     # GUI Callbacks
+    #################################################################
     def _saveButtonClicked(self):
 
         try:
@@ -76,5 +74,3 @@ class ScratchPadWidget(QtGui.QWidget):
         except:
             print "[!] Problem saving notes..."
             print traceback.format_exc()
-
-
