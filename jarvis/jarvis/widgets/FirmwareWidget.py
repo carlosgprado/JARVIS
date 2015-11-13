@@ -54,20 +54,21 @@ class FirmwareWidget(CustomWidget):
 
         self.binary_entropy.calculate_entropy()
         self.binary_entropy.adjust_entropy_values()
-        self.binary_entropy.cheap_scale()
 
-        im_w = self.binary_entropy.image_width
-        im_h = self.binary_entropy.image_height
+        im_w = 200
+        im_h = 200
+        grid_size = self.binary_entropy.grid_size
 
         # Fastest way from array to string
-        self.img_data = ''.join(self.binary_entropy.scaled_values)
+        self.img_data = ''.join(self.binary_entropy.entropy_d.values())
 
         # Get QImage from QByteArray (from string)
         ba = QtCore.QByteArray.fromRawData(self.img_data)
-        qi = QtGui.QImage(ba, im_w, im_h, QtGui.QImage.Format_RGB32)
+        qi = QtGui.QImage(ba, grid_size, grid_size, QtGui.QImage.Format_RGB32)
+        qi_scaled = qi.scaled(im_w, im_h, aspectMode = QtCore.Qt.KeepAspectRatio)
 
         # Get the QPixmap from a QImage
-        qp = QtGui.QPixmap.fromImage(qi)
+        qp = QtGui.QPixmap.fromImage(qi_scaled)
 
         # Apply the QPixmap to the label
         self.image = QtGui.QLabel()

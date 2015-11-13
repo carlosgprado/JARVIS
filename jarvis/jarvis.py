@@ -96,8 +96,8 @@ class JarvisPluginForm(PluginForm):
         self.jarvisWidgets.append(BinaryAnalysisWidget(self))
         self.jarvisWidgets.append(VulnDetectionWidget(self))
         self.jarvisWidgets.append(ImportExportWidget(self))
-        self.jarvisWidgets.append(ScratchPadWidget(self))
-        # self.jarvisWidgets.append(FirmwareWidget(self))
+        # self.jarvisWidgets.append(ScratchPadWidget(self))
+        self.jarvisWidgets.append(FirmwareWidget(self))
         self.jarvisWidgets.append(OptionsWidget(self))
 
         self.setupJarvisForm()

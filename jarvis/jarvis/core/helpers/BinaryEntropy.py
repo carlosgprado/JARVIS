@@ -11,7 +11,7 @@ from idautils import *
 
 import struct
 from collections import defaultdict
-from math import sqrt, log
+from math import log
 
 from Misc import entropy
 
@@ -24,11 +24,8 @@ class BinaryEntropy():
 
     def __init__(self):
         self.entropy_d = defaultdict(int)
-        self.image_width = 200
-        self.image_height = 200
-        self.nr_cells = 400
-        self.scaled_values = [0] * (self.image_width * self.image_height)
-        self.tile_size = 0
+        self.grid_size = 20
+        self.nr_cells = self.grid_size ** 2
 
     def get_block_size(self):
         """
@@ -93,41 +90,6 @@ class BinaryEntropy():
             # Remember, we need strings
             adjusted_entropy_s = struct.pack('>I', adjusted_entropy)
             self.entropy_d[idx] = adjusted_entropy_s
-
-    def cheap_scale(self):
-        """
-        In order to scale the Pixmap, I will just modify
-        the dataset accordingly.
-        Not sure if genius or completely dumb...
-        Probably the latter.
-        """
-
-        # Get "lines" (in nr. of tiles)
-        # Ex. 100 cells = 10 x 10 :)
-        tiles_per_row = int(sqrt(self.nr_cells))
-
-        # Tile size (scale factor)
-        # For now it is a square, so height = width
-        # Ex. 200 px / 10 cells = 20 px / cell
-        tile_size = self.image_width / tiles_per_row
-
-        # "Flatten" the dictionary to a list of values
-        # This array is "nr_cells" long
-        ev = [x for x in self.entropy_d.itervalues()]
-
-        pivots = []
-        for j in xrange(tiles_per_row):
-            for i in xrange(tiles_per_row):
-                p_idx = i * tile_size + j * self.image_width * tile_size
-                pivots.append(p_idx)
-
-        # There is a mapping between the pivots
-        # and the original entropy values
-        for idx in xrange(tiles_per_row * tiles_per_row):
-            p = pivots[idx]
-            for k in xrange(tile_size):
-                for l in xrange(tile_size):
-                    self.scaled_values[p + k + (l * self.image_width)] = ev[idx]
 
     def get_chunk_from_pos(self, x, y):
         """
