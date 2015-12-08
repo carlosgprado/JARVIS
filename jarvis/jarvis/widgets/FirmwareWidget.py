@@ -88,6 +88,7 @@ class FirmwareWidget(CustomWidget):
         y = event.pos().y()
 
         print "(%d, %d)" % (x, y)
+        self.binary_entropy.jump_to_bin_chunk(x, y)
 
     def _createToolBarActions(self):
 

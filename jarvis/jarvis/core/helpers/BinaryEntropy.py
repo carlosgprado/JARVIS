@@ -26,6 +26,7 @@ class BinaryEntropy():
         self.entropy_d = defaultdict(int)
         self.grid_size = 20
         self.nr_cells = self.grid_size ** 2
+        self.block_size = self.get_block_size()
 
     def get_block_size(self):
         """
@@ -46,7 +47,7 @@ class BinaryEntropy():
         different blocks
         :return: None
         """
-        block_size = self.get_block_size()
+        block_size = self.block_size
 
         for idx in xrange(self.nr_cells):
             block_start = MinEA() + (idx * block_size)
@@ -80,7 +81,7 @@ class BinaryEntropy():
         :return:
         """
         RGB32_MAX = 0xFFFFFFFF
-        entropy_max = log(self.get_block_size(), 2)
+        entropy_max = log(self.block_size, 2)
 
         # Correction: (e / e_max) * MAX
         for idx, e in enumerate(self.entropy_d.itervalues()):
@@ -91,11 +92,16 @@ class BinaryEntropy():
             adjusted_entropy_s = struct.pack('>I', adjusted_entropy)
             self.entropy_d[idx] = adjusted_entropy_s
 
-    def get_chunk_from_pos(self, x, y):
+    def jump_to_bin_chunk(self, x, y):
         """
         It calculates the requested binary chunk
         from the position clicked in the image
         :param: (x, y) position in pixels
         :return: Address within the binary
         """
-        pass
+        chunk_nr = (y % self.grid_size) * self.grid_size + x % self.grid_size
+        addr = MinEA() + chunk_nr * self.block_size
+
+        print "%x" % addr
+
+        idc.Jump(addr)
