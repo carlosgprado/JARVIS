@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Jarvis by carlosgprado</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Jarvis</h1>
+        <h2>&quot;Just Another ReVersIng Suite&quot; or whatever other bullshit you can think of </h2>
+        <a href="https://github.com/carlosgprado/JARVIS" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="jarvis" class="anchor" href="#jarvis" aria-hidden="true"><span class="octicon octicon-link"></span></a>J.A.R.V.I.S.</h1>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<ul>
+<li>
+<p>Why <em>JARVIS</em>?</p>
+
+<ul>
+<li>
+<em>JARVIS</em> means "Just Another ReVersIng Suite" or whatever other bullshit you can think of :)</li>
+</ul>
+</li>
+<li>
+<p>What is it?</p>
+
+<ul>
+<li>It is a small <em>bughunting</em> suite comprising three elements, namely:</li>
+<li>A fuzzer (see <a href="https://github.com/carlosgprado/NaFl">NaFl</a>)</li>
+<li>A tracer based on INTEL PIN</li>
+<li>A plugin for IDA Pro thought to assist you with the most common reversing tasks. It integrates with the tracer.</li>
+</ul>
+</li>
+<li>
+<p>Isn't there already something similar?</p>
+
+<ul>
+<li>Yes, "curious minds often converge on the same idea" :) and by the way, there is nothing new under the sun. 
+Now seriously, Alex and Daniel got it right with the code organization of their <a href="https://bitbucket.org/daniel_plohmann/simplifire.idascope">IDAScope plugin</a>, so I used it as a skeleton for mine. Kudos to them!</li>
+</ul>
+</li>
+<li>
+<p>Why does the code suck so much?</p>
+
+<ul>
+<li>Don't let physicists do computer science.</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><em>JARVIS</em> is written entirely in Python and it is thought to be completely standalone. That means, although it runs within IDA, you can just copy its whole directory to anywhere you want.
+However, it is recommended (as a matter of convenience) to copy the <strong>jarvis</strong> directory and the plugin <strong>jarvis_launcher.py</strong> to <strong>plugins/</strong></p>
+
+<p>The auxiliary plugin <em>jarvis_launcher.py</em> registers a shortcut (Alt-J) which launches the actual plugin.</p>
+
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<ul>
+<li>Python 2.7.x (grab it <a href="https://www.python.org/downloads">here</a>)
+
+<ul>
+<li>Recommended Python 2.7.9+ (includes pip)</li>
+</ul>
+</li>
+<li>NetworkX (pip install networkx)</li>
+<li>IDA Pro :)</li>
+</ul>
+
+<h2>
+<a id="graphical-user-interface" class="anchor" href="#graphical-user-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graphical User Interface</h2>
+
+<p><em>JARVIS</em> is written in PySide (Qt). It consists of a dockable Widget with several <strong>tabs</strong>, one for each different <em>category</em>.</p>
+
+<p>There are three different kinds of widgets, namely:</p>
+
+<ul>
+<li>Table view (for example <em>calls within current function</em>)</li>
+<li>Tree view (for example <em>dword compares</em>)</li>
+<li>Text view (the <em>logging</em> at the bottom)</li>
+</ul>
+
+<p><img src="img/main_ui.png" alt="JARVIS UI"></p>
+
+<h3>
+<a id="binary-analysis" class="anchor" href="#binary-analysis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Binary Analysis</h3>
+
+<p>Functionality related to <strong>binary analysis</strong> (dough!) without any special emphasis in vulnerability finding.</p>
+
+<p>At least I tried, sometimes the line between both is too thin...</p>
+
+<p><img src="img/binary_analysis.png" alt="Binary Analysis Toolbar"></p>
+
+<p>The options available in this tab are:</p>
+
+<ul>
+<li>Show most referenced functions</li>
+<li>Show dword compares
+
+<ul>
+<li>Checks whether global variables are being compared to immediate values (binary-wide). These usually hold things like error codes or alike. Identifying and renaming them allow a better understanding of new code when found again.</li>
+</ul>
+</li>
+<li>Mark immediate compares within the current function
+
+<ul>
+<li>It is helpful when analyzing something like a parser, for example.</li>
+</ul>
+</li>
+<li>Show calls within the current function
+
+<ul>
+<li>When reversing large functions it is nice to have all information at once. For example, if at once all calls are UI related, we can probably just rename this function and move on.</li>
+</ul>
+</li>
+<li>Show comments within the current function</li>
+<li>Show referenced strings within the current function</li>
+<li>Show input (file and network) connecting to the current function
+
+<ul>
+<li>Functions accepting any kind of input, for which there is a path connecting them and the current function.</li>
+</ul>
+</li>
+<li>Show a list of all functions in the binary
+
+<ul>
+<li>This is no longer necessary, will probably disappear in next versions.</li>
+</ul>
+</li>
+<li>Display connection graph (functions)</li>
+<li>Get all connections between functions accepting input and functions calling dangerous APIs
+
+<ul>
+<li>This is very CPU intensive, use with caution.</li>
+</ul>
+</li>
+<li>Paint path(s) connecting two basic blocks</li>
+<li>XOR selected bytes
+
+<ul>
+<li>useful with malware / simple encryption schemes</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="bug-hunting" class="anchor" href="#bug-hunting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bug Hunting</h3>
+
+<p>Functionality specifically designed around bug hunting goes here.</p>
+
+<p>There is not much at the moment...</p>
+
+<p><img src="img/bug_hunting.png" alt="Bug Hunting toolbar"></p>
+
+<ul>
+<li>Detection of banned APIs (MS)</li>
+<li>Integer issues
+
+<ul>
+<li>Right now this is too x86 specific</li>
+<li>Buggy and it gets confused sometimes by loops or alike. However, false positives are quickly detected and discarded by a human agent. </li>
+<li>There will be false positives and negatives but as a rule of thumb you will need 10 minutes (tops) to go through them. On the bright side you will have found a handful of <em>potentially</em> exploitable code spots (stack, heap based buffer overflows). </li>
+<li>Now you need to determine whether you can influence the parameters with your input.</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="import--export" class="anchor" href="#import--export" aria-hidden="true"><span class="octicon octicon-link"></span></a>Import &amp; Export</h3>
+
+<p>This is for interacting with external tools.</p>
+
+<p><img src="img/import_export.png" alt="Import / Export toolbar"></p>
+
+<ul>
+<li>Import a call trace from a <em>PinTool</em>
+</li>
+<li>Export the trace to file in <em>GraphML</em> format
+
+<ul>
+<li>Import it to an external graph editor / viewer like Yed</li>
+</ul>
+</li>
+<li>Import dynamic call resolution from a <em>PinTool</em>
+</li>
+<li>Export current function as hex
+
+<ul>
+<li>This is needed by some tools</li>
+</ul>
+</li>
+<li>Export patched bytes to file
+
+<ul>
+<li>Creates a copy of the original file replacing the bytes patched in the IDA database.</li>
+<li>Requested by m1k3 :)</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="scratchpad" class="anchor" href="#scratchpad" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scratchpad</h3>
+
+<p>This is the <strong>killer feature</strong> :)
+You can even save your notes to a file!</p>
+
+<p>Yes, I know IDA Pro already has this feature and saves the data to the IDB file but it looked convenient to have everything in one place.</p>
+
+<h3>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options</h3>
+
+<p>Runtime options controlling things like the amount of information being displayed, etc.</p>
+
+<p><img src="img/options.png" alt="Options tab"></p>
+
+<ul>
+<li>Show unique strings</li>
+<li>Show unique comments</li>
+<li>Show unique calls</li>
+<li>Calculate entropy (for strings)</li>
+<li>Connect BB cutoff
+
+<ul>
+<li>The cutoff parameter for the algorithm calculating paths between basic blocks</li>
+</ul>
+</li>
+<li>Connect functions cutoff
+
+<ul>
+<li>Analogous to the previous but for paths between functions</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="other-gui-augmentation" class="anchor" href="#other-gui-augmentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other GUI augmentation</h3>
+
+<p><strong>NOTE</strong>: a large amount of people still using an older version of IDA, for unknown reasons (cough, chinese guy, cough, australian company). Since the GUI features described below are based on changes introduced in version 6.7 of IDA, JARVIS was unable to start.</p>
+
+<p>A quick workaround has been introduced to allow JARVIS to run in older versions of IDA, with limited functionality. 
+However, the "connect functions" graph can still be used by selecting the origin and destination functions clicking the "show all functions" button and using the context menu (see screenshot below)</p>
+
+<p><img src="img/connect_functions_workaround.png" alt="Connect functions workaround"></p>
+
+<p><strong>And now for the IDA 6.7+ users</strong></p>
+
+<p>The main goal of <em>JARVIS</em> is to get out of the way while adding some nice features which allow you to work faster. With this goal in mind, some <em>GUI augmentation</em> has been added for your clicking pleasure.</p>
+
+<p><strong>Calculating paths between basic blocks</strong></p>
+
+<p>A new context menu has been added to the <em>disassembly view (the graph thingy)</em>. Of course it is labeled <em>JARVIS</em>.</p>
+
+<p><img src="img/ctx_menu_connect_bb.png" alt="Connect basic blocks context menu"></p>
+
+<p>Simply right click the basic block on the graph view and select the appropiate menu entry. You will see some logging on IDA's <em>output window</em></p>
+
+<p>Once you got both start and end basic blocks selected, click the <em>connect basic blocks</em> button to get a list of all possible paths connecting them.</p>
+
+<p><img src="img/connect_bb_button.png" alt="Connect basic blocks toolbar button"></p>
+
+<p>Double clicking the <em>Path ID</em> you will be presented with a color chooser widget where you can select a custom color to paint the choosen path on the graph view. </p>
+
+<p>A penetrating yellow, for example, always does the trick :)</p>
+
+<p><img src="img/connect_bb_list.png" alt="All paths between selected basic blocks"></p>
+
+<p>Voila! There you have your very visual path between basic blocks.</p>
+
+<p><img src="img/connect_bb_path.png" alt="Path connecting basic blocks"></p>
+
+<p><strong>Calculating paths between functions</strong></p>
+
+<p>Similarly to the method explained above, <em>JARVIS</em> adds a new menu item to the popup for the <em>functions window</em></p>
+
+<p><img src="img/ctx_menu_connect_functions.png" alt="Connect functions context menu"></p>
+
+<p><img src="img/connect_functions_button.png" alt="Connect functions button"></p>
+
+<p><img src="img/connect_functions_graph.png" alt="The graph showing the paths between functions"></p>
+
+<p>The graph is of course <em>clickable</em> and will take you to the corresponding function in IDA's <em>disassembly view</em> by double clicking on a node.</p>
+
+<h2>
+<a id="pintracer" class="anchor" href="#pintracer" aria-hidden="true"><span class="octicon octicon-link"></span></a>PinTracer</h2>
+
+<p>The complementary tracing tool is <strong>Intel PIN based</strong> with a <em>PySide</em> GUI.</p>
+
+<p>Since IDA Pro has a version of PySide itself, it is advised to install PySide in a <em>virtual environment</em> (<a href="https://github.com/kennethreitz/python-guide/blob/master/docs/dev/virtualenvs.rst">read this</a>)</p>
+
+<p><img src="img/pin_tracer_ui.png" alt="PinTracer UI (Mac OS X)"></p>
+
+<p><strong>To install it:</strong></p>
+
+<ul>
+<li>Move the PinTracer folder to some location of your choice.</li>
+<li>Run the <em>install.bat</em> file. It will create a JARVISVE directory within PinTracer, create a virtual environment and install PySide</li>
+<li>That should be it :)</li>
+</ul>
+
+<p>The batch script <em>run.bat</em> takes care of transparently preparing the virtual environment and running the PinTracer program.</p>
+
+<p>About the PinTool itself. A version compiled for Windows 32 bits against <a href="http://software.intel.com/sites/landingpage/pintool/downloads/pin-2.14-71313-msvc12-windows.zip">Pin 71313 (vc12)</a> is included.
+If you have another version of Pin, you will need to compile the PinTool against it. The source code is included (PinTracer/src_pintool/PinTracer.cpp) and the simplest way to compile it is to use the <em>MyPinTool</em> trick, 
+well described <a href="http://scrammed.blogspot.de/2013/03/binary-instrumentation-for-exploit_10.html">here</a></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/carlosgprado/JARVIS/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/carlosgprado/JARVIS/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/carlosgprado/JARVIS"></a> is maintained by <a href="https://github.com/carlosgprado">carlosgprado</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
