@@ -326,7 +326,7 @@ def write_to_graphml(edge_list, filename):
     :param edge_list: a list of edges [(u, v),...]
     :return: None
     """
-    dg = nx.DigGraph()
+    dg = nx.DiGraph()
     for u, v in edge_list:
         dg.add_node(u, label = u)
         dg.add_node(v, label = v)
