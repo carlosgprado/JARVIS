@@ -16,6 +16,7 @@ from jarvis.Config import JConfig
 from jarvis.core.BinaryAnalysis import BinaryAnalysis
 from jarvis.core.VulnDetection import VulnDetection
 from jarvis.core.ImportExport import ImportExport
+from jarvis.core.Firmware import Firmware
 
 from jarvis.widgets.VulnDetectionWidget import VulnDetectionWidget
 from jarvis.widgets.BinaryAnalysisWidget import BinaryAnalysisWidget
@@ -84,6 +85,7 @@ class JarvisPluginForm(PluginForm):
         self.binary_analysis = BinaryAnalysis()
         self.vuln_detection = VulnDetection()
         self.import_export = ImportExport()
+        self.firmware = Firmware()
 
     def setupWidgets(self):
         """

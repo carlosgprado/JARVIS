@@ -26,6 +26,7 @@ class FirmwareWidget(CustomWidget):
         self.img_data = None
 
         # Functionality associated with this widget
+        self.fw = parent.firmware
         self.binary_entropy = BE.BinaryEntropy()
 
         self._createGui()
@@ -92,26 +93,60 @@ class FirmwareWidget(CustomWidget):
 
     def _createToolBarActions(self):
 
-        self.bannedAction = QtGui.QAction(
-                QIcon(self.iconp + 'banned_ms_functions.png'),
-                '&Usage of functions banned by Microsoft',
+        self.rizzoProduceAction = QtGui.QAction(
+                QIcon(self.iconp + 'tag-add.png'),
+                '&Generate Rizzo signatures',
                 self,
-                triggered = self._notImplementedYet()
+                triggered = self._rizzo_produce
                 )
 
-        self.integerAction = QtGui.QAction(
-                QIcon(self.iconp + 'integer_issues.png'),
-                '&Search the whole binary for possible integer issues',
+        self.rizzoLoadAction = QtGui.QAction(
+                QIcon(self.iconp + 'tag-icon.png'),
+                '&Apply Rizzo signatures',
                 self,
-                triggered = self._notImplementedYet()
+                triggered = self._rizzo_load
                 )
 
-        self.toolbar.addAction(self.bannedAction)
-        self.toolbar.addAction(self.integerAction)
+        self.codatifyFixCode = QtGui.QAction(
+                QIcon(self.iconp + 'processor-icon.png'),
+                '&Fix Code',
+                self,
+                triggered = self._codatify_fix_code
+                )
+
+        self.codatifyFixData = QtGui.QAction(
+                QIcon(self.iconp + 'server_components.png'),
+                '&Fix Data',
+                self,
+                triggered = self._codatify_fix_data
+                )
+
+        self.toolbar.addAction(self.rizzoProduceAction)
+        self.toolbar.addAction(self.rizzoLoadAction)
+        self.toolbar.addSeparator()
+        self.toolbar.addAction(self.codatifyFixCode)
+        self.toolbar.addAction(self.codatifyFixData)
 
     #################################################################
     # GUI Callbacks
     #################################################################
+    def _rizzo_produce(self):
+        self._console_output("Building Rizzo signatures, this may take a few minutes...")
+        delta = self.fw.rizzo_produce(self._console_output)
+        self._console_output("Built signatures in {0:.2f} seconds".format(delta))
+
+    def _rizzo_load(self):
+        self._console_output("Applying Rizzo signatures, this may take a few minutes...")
+        ret = self.fw.rizzo_load(self._console_output)
+        if ret:
+            count, delta = ret
+            self._console_output("Applied {0} signatures in {0:.2f} seconds".format(count, delta))
+
+    def _codatify_fix_code(self):
+        self.fw.fix_code(self._console_output)
+
+    def _codatify_fix_data(self):
+        self.fw.fix_data(self._console_output)
 
     def _notImplementedYet(self):
         """

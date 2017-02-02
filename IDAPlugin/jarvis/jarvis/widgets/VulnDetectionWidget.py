@@ -99,7 +99,7 @@ class VulnDetectionWidget(CustomWidget):
 
             for ref_addr in refs:
                 ref_item = QTreeWidgetItem(bf_item)
-                ref_item.setText(1, "%x" % ref_addr)
+                ref_item.setText(1, "0x%x" % ref_addr)
                 ref_name = misc.get_function_name(ref_addr)
                 ref_item.setText(2, ref_name)
 

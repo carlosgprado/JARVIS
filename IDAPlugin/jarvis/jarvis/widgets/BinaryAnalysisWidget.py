@@ -386,7 +386,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             for value, addr in values:
                 value_item = QTreeWidgetItem(dw_item)
                 value_item.setText(1, value)
-                value_item.setText(2, "%x" % addr)
+                value_item.setText(2, "0x%x" % addr)
 
         # Display all items expanded initially
         self.tree.expandAll()
