@@ -1,6 +1,4 @@
 *.pyc
-*.obj
+*.db
 
-.DS_Store
-.idea/*
-*.sublime-project
+

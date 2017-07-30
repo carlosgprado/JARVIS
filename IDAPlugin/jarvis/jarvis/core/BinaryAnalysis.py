@@ -13,6 +13,7 @@ import itertools  # for islice()
 from collections import defaultdict
 
 import jarvis.core.helpers.Misc as misc
+from jarvis.core.helpers.Function import backtrace_args_x86
 import jarvis.core.helpers.Graphing as graphing
 from jarvis.Config import JConfig
 
@@ -78,7 +79,10 @@ class BinaryAnalysis():
 
             for v in s:
                 try:
-                    self.cache.string_list.append((v.ea, unicode(v)))
+                    str_t = GetStringType(v.ea)
+                    if str_t in (ASCSTR_C, ASCSTR_UNICODE):
+                        my_str = GetString(v.ea, strtype = str_t)
+                        self.cache.string_list.append((v.ea, my_str))
 
                 except:
                     print "Error processing string at %x" % v.ea
@@ -178,7 +182,13 @@ class BinaryAnalysis():
         for addr, dis in misc.iter_disasm():
             if "cmp" in dis:
                 if GetOpType(addr, 1) == o_imm:  # 5: immediate value
-                    cmp_addr.append((addr, dis))
+                    # If this is ASCII, display for convenience
+                    v = GetOperandValue(addr, 1)
+                    if v > 0x20 and v <0x7F:
+                        msg = "{0} ({1})".format(addr, chr(v))
+                    else:
+                        msg = dis
+                    cmp_addr.append((addr, msg))
 
         return cmp_addr
 
@@ -382,6 +392,40 @@ class BinaryAnalysis():
             return None
 
         return paths
+
+    def get_sneaky_imports(self):
+        """
+        Finds sneaky imports coming from
+        LoadLibrary / GetProcAddress :)
+        @returns: dict of tuples (op_ea, s)
+        """
+        sneaky_dict = {}
+        gpa_ea = LocByName("GetProcAddress") # EA
+
+        for caller in XrefsTo(gpa_ea, True):
+            # This is the address (within a function)
+            # where the reference was made
+            caller_ea = caller.frm
+            caller_name = GetFunctionName(caller_ea)
+
+            if caller_name not in sneaky_dict:
+                sneaky_dict[caller_name] = []
+
+            # Function signature
+            # GetProcAddress(hModule, func_name)
+            arg_list = backtrace_args_x86(caller_ea, 2)
+            op, op_ea = arg_list[1] # 0-indexed
+
+            string_addr = GetOperandValue(op_ea, 0)
+            str_t = GetStringType(string_addr)
+
+            if str_t in (ASCSTR_C, ASCSTR_UNICODE):
+                s = GetString(string_addr, strtype = str_t)
+                sneaky_dict[caller_name].append((op_ea, s))
+                print "{0} @ {1:08x} >> '{2}' <<".format(
+                        caller_name, op_ea, s)
+
+        return sneaky_dict
 
 
 #################################################################

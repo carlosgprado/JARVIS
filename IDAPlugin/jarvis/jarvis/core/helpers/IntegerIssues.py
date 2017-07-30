@@ -24,7 +24,7 @@ class IntegerIssues():
         self.dangerous_calls = set([])
         self.dangerous_funcs_dict = dict()
         self.dangerous_patterns = {
-                              'snprintf': 3,
+                              'snprintf': 2,
                               'strncpy': 3,
                               'memcpy': 3,
                               'memset': 3,
@@ -44,7 +44,6 @@ class IntegerIssues():
 
         # Let's fill the dangerous funcs dict based only on name
         # TODO: maybe do something with FLIRT signatures or alike?
-
         for func_ea in Functions():
             func_name = GetFunctionName(func_ea)
             for pattern, dang_arg_idx in self.dangerous_patterns.iteritems():
@@ -69,22 +68,22 @@ class IntegerIssues():
         which should correspond to the size argument
         @returns: list of arguments (may be empty)
         """
-
-        # TODO: x86 only at the moment, x64 at least
-        # TODO: the algo as a whole is flaky...
-        # which paths are being considered?
-        if misc.is_64bit():
-            raise NotImplementedError
-
-        prev_addr = ea
-        dang_args = []
         dang_name = GetOpnd(ea, 0)
         dang_arg_idx = 0
+        #x86_64_regs = ['rdi', 'rsi', 'rdx', 'rcx', 'r8', 'r9'] # System V AMD64 ABI
+        x86_64_regs = ['rcx', 'rdx', 'r8', 'r9'] # Microsoft x64
 
+        # TODO: the algo as a whole is flaky...
+        # which paths are being considered?
         for pat, arg_idx in self.dangerous_patterns.iteritems():
             if pat in dang_name:
                 dang_arg_idx = arg_idx
 
+        if misc.is_64bit():
+            return x86_64_regs[:dang_arg_idx]
+
+        prev_addr = ea
+        dang_args = []
         while dang_arg_idx > 0:
             pi = DecodePreviousInstruction(prev_addr)
 
@@ -132,6 +131,9 @@ class IntegerIssues():
                 # the corresponding comparison
                 cmpi = DecodePreviousInstruction(jumpi.ea)
 
+                if not cmpi:
+                    continue
+
                 if GetMnem(cmpi.ea) == "cmp":
                     return (GetOpnd(cmpi.ea, 0), GetOpnd(cmpi.ea, 1))
 
@@ -156,16 +158,11 @@ class IntegerIssues():
 
         for dang_call_ea in self.dangerous_calls:
             # Get a list of arguments pushed before the call
-            try:
-                dang_args = self.get_dangerous_args(dang_call_ea)
-                if not dang_args:
-                    continue
+            dang_args = self.get_dangerous_args(dang_call_ea)
+            if not dang_args:
+                continue
 
-                last_arg = dang_args[-1]
-
-            except NotImplementedError:
-                # x86 only, for now
-                raise
+            last_arg = dang_args[-1]
 
             # Get the (signed) cmp before the signed jump
             cmp_args = self.get_signed_cmp(dang_call_ea)

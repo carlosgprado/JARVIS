@@ -139,6 +139,13 @@ class BinaryAnalysisWidget(cw.CustomWidget):
                 triggered = self._xorSelection
                 )
 
+        self.sneakyAction = QtGui.QAction(
+                QIcon(self.iconp + 'binary_analysis.png'),
+                '&Finds sneaky imports',
+                self,
+                triggered = self._showSneakyImports
+                )
+
         self.toolbar.addAction(self.mostRefAction)
         self.toolbar.addAction(self.dwCmpsAction)
         self.toolbar.addSeparator()
@@ -154,6 +161,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.toolbar.addAction(self.bbConnAction)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.xorAction)
+        self.toolbar.addAction(self.sneakyAction)
 
     #################################################################
     # GUI Callbacks
@@ -389,6 +397,24 @@ class BinaryAnalysisWidget(cw.CustomWidget):
                 value_item.setText(2, "0x%x" % addr)
 
         # Display all items expanded initially
+        # self.tree.expandAll()
+
+    def _showSneakyImports(self):
+        self._console_output("Looking for sneaky imports...")
+        self.tree_label.setText("Sneaky imports")
+
+        sneaky_dict = self.ba.get_sneaky_imports()
+        self.tree.setHeaderLabels(("Caller", "Address", "Import"))
+
+        for caller, values in sneaky_dict.iteritems():
+            sneaky_item = QTreeWidgetItem(self.tree)
+            sneaky_item.setText(0, caller)
+
+            for addr, imp_name in values:
+                value_item = QTreeWidgetItem(sneaky_item)
+                value_item.setText(1, "0x%x" % addr)
+                value_item.setText(2, imp_name)
+
         self.tree.expandAll()
 
     def _showAllFunctions(self):
