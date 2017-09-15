@@ -374,7 +374,7 @@ class Rizzo(object):
             if LocByName(name) == BADADDR:
                 if MakeName(ea, name):
                     SetFunctionFlags(ea, (GetFunctionFlags(ea) | FUNC_LIB))
-                    self.sayt("%s  =>  %s" % (curname, name))
+                    self.say("%s  =>  %s" % (curname, name))
                     return 1
             #else:
             self.sayprint("WARNING: Attempted to rename '%s' => '%s', but '%s' already exists!" % (curname, name, name))
