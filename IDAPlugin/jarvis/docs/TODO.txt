@@ -9,7 +9,7 @@ Things TO DO in JARVIS when you are 0xDEAD
 [done] Save scratchpad notes to file
 [done] Options -> Strings, Comments -> show unique hits (default: False)
 [done] Ability to order columns in tables
-[done] Add a QtGui.QColorDialog to select the PIN trace color at import time :)
+[done] Add a QColorDialog to select the PIN trace color at import time :)
     See zetcode.com/gui/pysidetutorial/dialogs
 [done] Connection graph
 [done] Change from buttons to a nice toolbar :)

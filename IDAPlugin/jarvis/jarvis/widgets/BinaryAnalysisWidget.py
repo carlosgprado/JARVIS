@@ -5,9 +5,10 @@
 #
 
 
-from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon
-from PySide.QtGui import QTableWidgetItem, QTreeWidgetItem
+from PyQt5 import QtCore
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QAbstractItemView
+from PyQt5.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QColorDialog
 
 import jarvis.widgets.CustomWidget as cw
 import jarvis.core.helpers.Misc as misc
@@ -25,17 +26,15 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.name = "Binary analysis"
         self.parent = parent
         self.config = self.parent.config
-        self.icon = QIcon(self.iconp + 'binary_analysis.png')
+        self.icon = QIcon(self.icon_path + 'binary_analysis.png')
 
         # Functionality associated with this widget
         self.ba = parent.binary_analysis
-        QtCore.QTextCodec.setCodecForCStrings(
-            QtCore.QTextCodec.codecForName("UTF-8"))
 
         self._createGui()
 
     def _createGui(self):
-
+        """ Creates the GUI :) """
         self._createToolBar('Binary')
         self._createToolBarActions()
         self._createOutputWindow()
@@ -52,99 +51,85 @@ class BinaryAnalysisWidget(cw.CustomWidget):
 
     def _createToolBarActions(self):
 
-        self.mostRefAction = QtGui.QAction(
-                QIcon(self.iconp + 'most_ref.png'),
+        self.mostRefAction = QAction(
+                QIcon(self.icon_path + 'most_ref.png'),
                 '&Show most referenced functions',
-                self,
-                triggered = self._showMostReferenced
-                )
+                self)
+        self.mostRefAction.triggered.connect(self._showMostReferenced)
 
-        self.immCmpsAction = QtGui.QAction(
-                QIcon(self.iconp + 'mark_imm_cmps.png'),
-                '&Mark immediate compares within the current function. \
-                Useful with parsers',
-                self,
-                triggered = self._markImmCompares
-                )
+        self.immCmpsAction = QAction(
+                QIcon(self.icon_path + 'mark_imm_cmps.png'),
+                '&Mark immediate compares within the current function.',
+                self)
+        self.immCmpsAction.triggered.connect(self._markImmCompares)
 
-        self.dwCmpsAction = QtGui.QAction(
-                QIcon(self.iconp + 'globals_cmp_imm.png'),
+        self.dwCmpsAction = QAction(
+                QIcon(self.icon_path + 'globals_cmp_imm.png'),
                 '&Search for global variables being compared \
                 to immediate values',
-                self,
-                triggered = self._showDwordCompares
-                )
+                self)
+        self.dwCmpsAction.triggered.connect(self._showDwordCompares)
 
-        self.callsAction = QtGui.QAction(
-                QIcon(self.iconp + 'graph_curr_function.png'),
+        self.callsAction = QAction(
+                QIcon(self.icon_path + 'graph_curr_function.png'),
                 '&Show calls within the current function',
-                self,
-                triggered = self._callsInThisFunction
-                )
+                self)
+        self.callsAction.triggered.connect(self._callsInThisFunction)
 
-        self.commsAction = QtGui.QAction(
-                QIcon(self.iconp + 'comments_curr_function.png'),
+        self.commsAction = QAction(
+                QIcon(self.icon_path + 'comments_curr_function.png'),
                 '&Show IDA generated comments within the current function',
-                self,
-                triggered = self._commentsInThisFunction
-                )
+                self)
+        self.commsAction.triggered.connect(self._commentsInThisFunction)
 
-        self.stringsAction = QtGui.QAction(
-                QIcon(self.iconp + 'strings_curr_function.png'),
+        self.stringsAction = QAction(
+                QIcon(self.icon_path + 'strings_curr_function.png'),
                 '&Search references to strings within the current function',
-                self,
-                triggered = self._showStringXrefs
-                )
+                self)
+        self.stringsAction.triggered.connect(self._showStringXrefs)
 
-        self.inputsAction = QtGui.QAction(
-                QIcon(self.iconp + 'io_connecting_to.png'),
+        self.inputsAction = QAction(
+                QIcon(self.icon_path + 'io_connecting_to.png'),
                 '&Locate IO connecting to current function. CPU intensive!',
-                self,
-                triggered = self._showConnectedIO
-                )
+                self)
+        self.inputsAction.triggered.connect(self._showConnectedIO)
 
-        self.allFuncsAction = QtGui.QAction(
-                QIcon(self.iconp + 'function_list.png'),
+        self.allFuncsAction = QAction(
+                QIcon(self.icon_path + 'function_list.png'),
                 '&Display function list for the connect graph',
-                self,
-                triggered = self._showAllFunctions
-                )
+                self)
+        self.allFuncsAction.triggered.connect(self._showAllFunctions)
 
-        self.connGraphAction = QtGui.QAction(
-                QIcon(self.iconp + 'show_connect_graph.png'),
+
+        self.connGraphAction = QAction(
+                QIcon(self.icon_path + 'show_connect_graph.png'),
                 '&Shows the connect graph',
-                self,
-                triggered = self._showConnectionGraph
-                )
+                self)
+        self.connGraphAction.triggered.connect(self._showConnectionGraph)
 
-        self.dangConnAction = QtGui.QAction(
-                QIcon(self.iconp + 'connect_io_danger.png'),
-                '&Shows all connections between IO input and dangerous \
-                functions (CPU intensive!)',
-                self,
-                triggered = self._showDangerousConnections
-                )
+        self.dangConnAction = QAction(
+                QIcon(self.icon_path + 'connect_io_danger.png'),
+                '&Connections between IO input and dangerous functions',
+                self)
+        self.dangConnAction.triggered.connect(self._showDangerousConnections)
 
-        self.bbConnAction = QtGui.QAction(
-                QIcon(self.iconp + 'connect_bb.png'),
+        self.bbConnAction = QAction(
+                QIcon(self.icon_path + 'connect_bb.png'),
                 '&Shows all connections between selected basic blocks',
-                self,
-                triggered = self._showConnectedBBs
-                )
+                self)
+        self.bbConnAction.triggered.connect(self._showConnectedBBs)
 
-        self.xorAction = QtGui.QAction(
-                QIcon(self.iconp + 'xor_bytes.png'),
+        self.xorAction = QAction(
+                QIcon(self.icon_path + 'xor_bytes.png'),
                 '&XOR the selected bytes with a single byte',
-                self,
-                triggered = self._xorSelection
-                )
+                self)
+        self.xorAction.triggered.connect(self._xorSelection)
 
-        self.sneakyAction = QtGui.QAction(
-                QIcon(self.iconp + 'binary_analysis.png'),
+        self.sneakyAction = QAction(
+                QIcon(self.icon_path + 'binary_analysis.png'),
                 '&Finds sneaky imports',
-                self,
-                triggered = self._showSneakyImports
-                )
+                self)
+        self.sneakyAction.triggered.connect(self._showSneakyImports)
 
         self.toolbar.addAction(self.mostRefAction)
         self.toolbar.addAction(self.dwCmpsAction)
@@ -204,7 +189,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.output_window.append("Marking all immediate compares...")
         self.table_label.setText("Immediate compares within current function")
 
-        INS_COLOR = 0x2020c0
+        ins_color = 0x2020c0
 
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(("Address", "Disassembly"))
@@ -223,7 +208,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             self.table.setItem(idx, 0, addr_item)
             self.table.setItem(idx, 1, dis_item)
 
-            misc.set_ins_color(cmp_ea, INS_COLOR)
+            misc.set_ins_color(cmp_ea, ins_color)
             idx += 1
 
     def _callsInThisFunction(self):
@@ -236,8 +221,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         show_unique_calls = self.config.display_unique_calls
         callee_list = self.ba.calls_in_function()
 
-        nrows = len(callee_list)
-        if not nrows:
+        nr_rows = len(callee_list)
+        if not nr_rows:
             self._console_output("[!] No calls found", err = True)
             return
 
@@ -282,8 +267,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         comment_list = self.ba.comments_in_function()
 
         # Found any comment at all?
-        nrows = len(comment_list)
-        if not nrows:
+        nr_rows = len(comment_list)
+        if not nr_rows:
             self._console_output("[!] No comments found", err = True)
             return
 
@@ -329,8 +314,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         s_ref_list = self.ba.get_string_references()
 
         # Found any references at all?
-        nrows = len(s_ref_list)
-        if not nrows:
+        nr_rows = len(s_ref_list)
+        if not nr_rows:
             self._console_output("[!] No string references found", err = True)
             return
 
@@ -397,7 +382,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
                 value_item.setText(2, "0x%x" % addr)
 
         # Display all items expanded initially
-        # self.tree.expandAll()
+        self.tree.expandAll()
 
     def _showSneakyImports(self):
         self._console_output("Looking for sneaky imports...")
@@ -459,8 +444,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         self.table.scrollToItem(
             # current_ea_item,
             self.table.item(c_idx, 0),
-            QtGui.QAbstractItemView.PositionAtTop
-            )
+            QAbstractItemView.PositionAtTop)
 
     def _showConnectionGraph(self):
         """
@@ -472,10 +456,10 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         try:
             u = InfoUI.function_orig_ea
             v = InfoUI.function_dest_ea
-
         except:
             self._console_output("[!] You must select the \
                 corresponding functions", err = True)
+            return
 
         cg = self.ba.get_connect_graph(u, v)
         res = self.ba.show_connect_graph(cg)
@@ -494,8 +478,8 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         io_list = self.ba.input_to_function()
 
         if not io_list:
-            self._console_output("[!] No (obvious) IO connecting \
-                to this function", err = True)
+            self._console_output("[!] No (obvious) IO connecting to this function",
+                                 err = True)
             return
 
         self.table.setColumnCount(2)
@@ -521,7 +505,11 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         and the ones calling dangerous APIs
         """
         self._console_output("Calculating dangerous connections...")
-        conn_graphs = self.ba.get_all_dangerous_connections()
+        try:
+            conn_graphs = self.ba.get_all_dangerous_connections()
+        except Exception as e:
+            print "[!] Error in get_all_dangerous_connections()", e
+            return
 
         if not conn_graphs:
             self._console_output("[!] No (obvious) dangerous connections", err = True)
@@ -611,7 +599,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
             idx = int(it)   # decimal
             bb_path = self.ba.cache.bb_paths[idx]
 
-            col = QtGui.QColorDialog.getColor()
+            col = QColorDialog.getColor()
             if col.isValid():
                 # IDA works with BGR (annoying)
                 ida_color = misc.pyside_to_ida_color(col.name())

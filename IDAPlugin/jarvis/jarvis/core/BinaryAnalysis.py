@@ -73,7 +73,7 @@ class BinaryAnalysis():
         if not self.cache.string_list:
             # acts if string_list is not cached (initially)
             s = Strings(False)
-            s.setup(strtypes = Strings.STR_UNICODE | Strings.STR_C)
+            s.setup()
 
             self.cache.string_list = []
 
@@ -81,7 +81,7 @@ class BinaryAnalysis():
                 try:
                     str_t = GetStringType(v.ea)
                     if str_t in (ASCSTR_C, ASCSTR_UNICODE):
-                        my_str = GetString(v.ea, strtype = str_t)
+                        my_str = GetString(v.ea)
                         self.cache.string_list.append((v.ea, my_str))
 
                 except:
@@ -411,16 +411,20 @@ class BinaryAnalysis():
             if caller_name not in sneaky_dict:
                 sneaky_dict[caller_name] = []
 
-            # Function signature
-            # GetProcAddress(hModule, func_name)
-            arg_list = backtrace_args_x86(caller_ea, 2)
-            op, op_ea = arg_list[1] # 0-indexed
+            try:
+                # Function signature
+                # GetProcAddress(hModule, func_name)
+                arg_list = backtrace_args_x86(caller_ea, 2)
+                op, op_ea = arg_list[1] # 0-indexed
+            except Exception as e:
+                # Best effort
+                continue
 
             string_addr = GetOperandValue(op_ea, 0)
             str_t = GetStringType(string_addr)
 
             if str_t in (ASCSTR_C, ASCSTR_UNICODE):
-                s = GetString(string_addr, strtype = str_t)
+                s = GetString(string_addr)
                 sneaky_dict[caller_name].append((op_ea, s))
                 print "{0} @ {1:08x} >> '{2}' <<".format(
                         caller_name, op_ea, s)

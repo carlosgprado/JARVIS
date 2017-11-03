@@ -6,12 +6,13 @@
 
 import traceback
 
-from PySide import QtGui
-from PySide.QtGui import QTextEdit, QIcon, QFileDialog
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QWidget, QTextEdit, QFileDialog
+from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QLabel
 
 
 #################################################################
-class ScratchPadWidget(QtGui.QWidget):
+class ScratchPadWidget(QWidget):
 
     def __init__(self, parent):
         """
@@ -19,12 +20,12 @@ class ScratchPadWidget(QtGui.QWidget):
         This widget is kind of different.
         It does not exactly subclass CustomWidget
         """
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         self.name = "Scratchpad"
         self.parent = parent
         self.config = self.parent.config
-        self.iconp = self.config.icons_path
-        self.icon = QIcon(self.iconp + 'pencil.png')
+        self.icon_path = self.config.icons_path
+        self.icon = QIcon(self.icon_path + 'pencil.png')
 
         self._createGui()
 
@@ -32,10 +33,10 @@ class ScratchPadWidget(QtGui.QWidget):
 
         self._createScratchPadWindow()
 
-        scratchpad_layout = QtGui.QVBoxLayout()
-        save_btn = QtGui.QPushButton("Save to file", self)
-        save_btn.setIcon(QIcon(self.iconp + 'save-download.png'))
-        label = QtGui.QLabel("Write some notes here")
+        scratchpad_layout = QVBoxLayout()
+        save_btn = QPushButton("Save to file", self)
+        save_btn.setIcon(QIcon(self.icon_path + 'save-download.png'))
+        label = QLabel("Write some notes here")
 
         scratchpad_layout.addWidget(label)
         scratchpad_layout.addWidget(self.scratchpad_window)
@@ -71,6 +72,6 @@ class ScratchPadWidget(QtGui.QWidget):
 
             print "Saved notes to \"%s\"" % filename
 
-        except:
+        except Exception as e:
             print "[!] Problem saving notes..."
             print traceback.format_exc()

@@ -6,9 +6,9 @@
 
 import traceback
 
-from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon
-from PySide.QtGui import QTableWidgetItem
+from PyQt5 import QtCore, Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QTableWidgetItem, QAction, QColorDialog
 
 from jarvis.widgets.CustomWidget import CustomWidget
 import jarvis.core.helpers.Misc as misc
@@ -19,14 +19,14 @@ from jarvis.core.helpers.Patching import patch_binary
 class ImportExportWidget(CustomWidget):
 
     def __init__(self, parent = None):
-        '''
+        """
         Constructor
-        '''
+        """
         CustomWidget.__init__(self)
         self.name = "Import / Export"
         self.parent = parent
         self.config = self.parent.config
-        self.icon = QIcon(self.iconp + 'import_export.png')
+        self.icon = QIcon(self.icon_path + 'import_export.png')
 
         # Functionality associated with this widget
         self.ie = parent.import_export
@@ -48,40 +48,35 @@ class ImportExportWidget(CustomWidget):
 
     def _createToolBarActions(self):
 
-        self.impTraceAction = QtGui.QAction(
-                QIcon(self.iconp + 'import_pin_trace.png'),
+        self.impTraceAction = QAction(
+                QIcon(self.icon_path + 'import_pin_trace.png'),
                 '&Import a PIN trace from file',
-                self,
-                triggered = self._showImportTrace
-                )
+                self)
+        self.impTraceAction.triggered.connect(self._showImportTrace)
 
-        self.expGraphmlAction = QtGui.QAction(
-                QIcon(self.iconp + 'export_trace_graphml.png'),
+        self.expGraphmlAction = QAction(
+                QIcon(self.icon_path + 'export_trace_graphml.png'),
                 '&Export current PIN trace to GraphML',
-                self,
-                triggered = self._showExportTraceGraphML
-                )
+                self)
+        self.expGraphmlAction.triggered.connect(self._showExportTraceGraphML)
 
-        self.dynamicCallsAction = QtGui.QAction(
-                QIcon(self.iconp + 'import_dyncall_info.png'),
+        self.dynamicCallsAction = QAction(
+                QIcon(self.icon_path + 'import_dyncall_info.png'),
                 '&Import dynamic call resolution information from PIN tool',
-                self,
-                triggered = self._showDynamicCalls
-                )
+                self)
+        self.dynamicCallsAction.triggered.connect(self._showDynamicCalls)
 
-        self.exportAction = QtGui.QAction(
-                QIcon(self.iconp + 'export_function_bytes.png'),
+        self.exportAction = QAction(
+                QIcon(self.icon_path + 'export_function_bytes.png'),
                 '&Export the current function code (ascii hex encoded)',
-                self,
-                triggered = self._showExportFunction
-                )
+                self)
+        self.exportAction.triggered.connect(self._showExportFunction)
 
-        self.patchAction = QtGui.QAction(
-                QIcon(self.iconp + 'patch_binary.png'),
+        self.patchAction = QAction(
+                QIcon(self.icon_path + 'patch_binary.png'),
                 '&Patch the original binary with the IDA modifications',
-                self,
-                triggered = self._patchBinary
-                )
+                self)
+        self.patchAction.triggered.connect(self._patchBinary)
 
         self.toolbar.addAction(self.impTraceAction)
         self.toolbar.addAction(self.expGraphmlAction)
@@ -102,11 +97,10 @@ class ImportExportWidget(CustomWidget):
         self._console_output("Importing PIN trace information from file...")
 
         # Color for the basic blocks hit during the trace
-        col = QtGui.QColorDialog.getColor()
+        col = QColorDialog.getColor()
         if col.isValid():
             # IDA works with BGR (annoying)
             ida_color = misc.pyside_to_ida_color(col.name())
-
         else:
             # Probably closed the QColorDialog
             self._console_output("[!] Problem getting color for trace. Aborting.")
@@ -114,8 +108,7 @@ class ImportExportWidget(CustomWidget):
 
         try:
             imported_info_dict = self.ie.ti.import_data(ida_color)
-
-        except:
+        except Exception as e:
             self._console_output("[!] Problem importing from file", err = True)
             self._console_output(traceback.format_exc(), err = True)
             return
@@ -129,7 +122,7 @@ class ImportExportWidget(CustomWidget):
 
         # Fill with contents
         # TODO: This could be better in a QTree or maybe adding
-        # a dropdown to select the thread id...
+        # a drop down menu to select the thread id...
         idx = 0
         for tid, call_list in imported_info_dict.iteritems():
             self._console_output("Processing Thread ID %d" % tid)
@@ -161,7 +154,7 @@ class ImportExportWidget(CustomWidget):
 
         ret = self.ie.ti.export_to_graphml()
         if not ret:
-            self._console_output("Error exporting trace to graphml", err = True)
+            self._console_output("Error exporting trace to GraphML", err = True)
 
         else:
             self._console_output("Exported successfully")
@@ -177,7 +170,7 @@ class ImportExportWidget(CustomWidget):
             # TODO: display the results in the widget
             dyn_calls = self.ie.ti.import_dynamic_calls()
 
-        except:
+        except Exception as e:
             self._console_output("[!] Problem importing dynamic calls", err = True)
             self._console_output(traceback.format_exc(), err = True)
             return

@@ -8,8 +8,8 @@ from idc import *
 from idautils import *
 from idaapi import *
 
-from PySide import QtGui
-from PySide.QtGui import QIcon
+from PyQt5.QtWidgets import QTabWidget, QVBoxLayout
+from PyQt5.QtGui import QIcon
 
 from jarvis.Config import JConfig
 
@@ -21,20 +21,12 @@ from jarvis.core.Firmware import Firmware
 from jarvis.widgets.VulnDetectionWidget import VulnDetectionWidget
 from jarvis.widgets.BinaryAnalysisWidget import BinaryAnalysisWidget
 from jarvis.widgets.ImportExportWidget import ImportExportWidget
-from jarvis.widgets.ScratchPadWidget import ScratchPadWidget
 from jarvis.widgets.OptionsWidget import OptionsWidget
 from jarvis.widgets.FirmwareWidget import FirmwareWidget
 
-__VERSION__ = 0.7
+from jarvis.core.helpers.UI import install_ui_hooks
 
-# Nasty workaround
-IS_NEW_IDA = True
-
-try:
-    from jarvis.core.helpers.UI import install_ui_hooks
-
-except NameError:
-    IS_NEW_IDA = False
+__VERSION__ = 0.8
 
 
 #################################################################
@@ -51,7 +43,9 @@ class JarvisPluginForm(PluginForm):
         super(JarvisPluginForm, self).__init__()
         self.jarvisWidgets = []
         self.config = JConfig()
-        self.iconp = self.config.icons_path
+        self.icon_path = self.config.icons_path
+        self.tabs = None
+        self.parent = None
 
     def showBanner(self):
         """
@@ -69,8 +63,8 @@ class JarvisPluginForm(PluginForm):
         This is called on form creation (obviously)
         """
         self.showBanner()
-        self.parent = self.FormToPySideWidget(form)
-        self.parent.setWindowIcon(QIcon(self.iconp + 'user-ironman.png'))
+        self.parent = self.FormToPyQtWidget(form)
+        self.parent.setWindowIcon(QIcon(self.icon_path + 'user-ironman.png'))
 
         self.setupCore()
         self.setupWidgets()
@@ -80,7 +74,7 @@ class JarvisPluginForm(PluginForm):
         """
         Initializes all internal functionality
         """
-        print "= Instantiating core modules...\n"
+        print "* Instantiating core modules...\n"
 
         self.binary_analysis = BinaryAnalysis()
         self.vuln_detection = VulnDetection()
@@ -91,14 +85,13 @@ class JarvisPluginForm(PluginForm):
         """
         Instantiates all widgets
         """
-        print "= Creating / Loading individual widgets..."
+        print "* Creating / Loading individual widgets..."
 
-        # TODO: programatically load the desired widgets
+        # TODO: programmatically load the desired widgets
         # Append to the list every widget you have
         self.jarvisWidgets.append(BinaryAnalysisWidget(self))
         self.jarvisWidgets.append(VulnDetectionWidget(self))
         self.jarvisWidgets.append(ImportExportWidget(self))
-        # self.jarvisWidgets.append(ScratchPadWidget(self))
         self.jarvisWidgets.append(FirmwareWidget(self))
         self.jarvisWidgets.append(OptionsWidget(self))
 
@@ -108,13 +101,13 @@ class JarvisPluginForm(PluginForm):
         """
         Already initialized widgets are arranged in tabs on the main window.
         """
-        self.tabs = QtGui.QTabWidget()
+        self.tabs = QTabWidget()
         self.tabs.setTabsClosable(False)
 
         for widget in self.jarvisWidgets:
             self.tabs.addTab(widget, widget.icon, widget.name)
 
-        layout = QtGui.QVBoxLayout()
+        layout = QVBoxLayout()
         layout.addWidget(self.tabs)
 
         self.parent.setLayout(layout)
@@ -124,17 +117,8 @@ class JarvisPluginForm(PluginForm):
         Manages the IDA UI extensions / modifications.
         NOTE: This uses some GUI functionality introduced
         in IDA 6.7
-        As a cheap workaround, I will deactivate the UI hooks
-        if the version of IDA does not support them. At least
-        a large portion of the plugin is still usable...
         """
-        if IS_NEW_IDA:
-            install_ui_hooks()
-
-        else:
-            print '[!] It appears your version of IDA is lower than 6.7'
-            print '[!] Some functionality has been deactivated (custom popup menus)'
-            print '[!] Other problems are expected but a large portion of JARVIS should be usable'
+        install_ui_hooks()
 
     def Show(self):
         """
@@ -153,8 +137,7 @@ class JarvisPluginForm(PluginForm):
         """
         Perform some cleanup here, if necessary
         """
-        print "= [*] JarvisPluginForm closed"
-        print "=============================================\n"
+        print "* JarvisPluginForm closed *"
 
 
 #################################################################

@@ -142,32 +142,36 @@ class TraceImporter():
 
         filename = AskFile(1, "*.json", "File to import information from?")
 
-        with open(filename, 'r') as f:
-            j_obj = json.loads(f.read())
+        try:
+            with open(filename, 'r') as f:
+                j_obj = json.loads(f.read())
 
-            # Need to rebase?
-            image_base = self.get_image_base(filename)
-            ida_base = get_imagebase()  # idaapi
-            delta = image_base - ida_base
+                # Need to rebase?
+                image_base = self.get_image_base(filename)
+                ida_base = get_imagebase()  # idaapi
+                delta = image_base - ida_base
 
-            if delta:
-                # IDA would go ahead with the rebasing process
-                # even if the delta is zero. This avoids it.
-                rebase_program(delta, MSF_FIXONCE)
+                if delta:
+                    # IDA would go ahead with the rebasing process
+                    # even if the delta is zero. This avoids it.
+                    rebase_program(delta, MSF_FIXONCE)
 
-            for c in j_obj['calls']:
-                if not c['indirect']:
-                    continue
+                for c in j_obj['calls']:
+                    if not c['indirect']:
+                        continue
 
-                u_ea = c['u']
-                v_ea = c['v']
+                    u_ea = c['u']
+                    v_ea = c['v']
 
-                # Filter dynamic calls related to system DLLs (ghetto)
-                if u_ea > 0x00800000:
-                    continue
+                    # Filter dynamic calls related to system DLLs (ghetto)
+                    if u_ea > 0x00800000:
+                        continue
 
-                # set: unique entries
-                dyn_calls_dict[u_ea].add(v_ea)
+                    # set: unique entries
+                    dyn_calls_dict[u_ea].add(v_ea)
+        except Exception as e:
+            # We just return silently
+            return
 
         # Add these calls to the IDB
         for frm, to_list in dyn_calls_dict.iteritems():

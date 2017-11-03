@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cdebc03a-cfc4-48ee-aad3-420a9a9419a6" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/docs/TODO.txt" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/docs/TODO.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/BinaryAnalysis.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/BinaryAnalysis.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/ImportExport.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/ImportExport.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/helpers/Misc.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/helpers/Misc.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/OptionsWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/OptionsWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ScratchPadWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ScratchPadWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/VulnDetectionWidget.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/VulnDetectionWidget.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py" afterPath="$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PinTracer/pintracer/PinTracerUI.pyw" afterPath="$PROJECT_DIR$/PinTracer/pintracer/PinTracerUI.pyw" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="600">
+      <file leaf-file-name="VulnDetectionWidget.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/VulnDetectionWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="63" column="21" lean-forward="true" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
+              <folding>
+                <element signature="e#132#156#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ImportExportWidget.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-4407">
+              <caret line="31" column="38" lean-forward="false" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="38" />
+              <folding>
+                <element signature="e#104#120#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BinaryAnalysisWidget.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="613">
+              <caret line="512" column="0" lean-forward="true" selection-start-line="512" selection-start-column="0" selection-end-line="512" selection-end-column="0" />
+              <folding>
+                <element signature="e#133#157#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BinaryAnalysis.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/BinaryAnalysis.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="545">
+              <caret line="45" column="41" lean-forward="false" selection-start-line="45" selection-start-column="41" selection-end-line="45" selection-end-column="41" />
+              <folding>
+                <element signature="e#170#187#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FirmwareWidget.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1024">
+              <caret line="92" column="62" lean-forward="true" selection-start-line="92" selection-start-column="62" selection-end-line="92" selection-end-column="62" />
+              <folding>
+                <element signature="e#131#160#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Firmware.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/Firmware.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1354">
+              <caret line="40" column="20" lean-forward="false" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="20" />
+              <folding>
+                <element signature="e#99#116#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ImportExport.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/ImportExport.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="769">
+              <caret line="172" column="37" lean-forward="false" selection-start-line="172" selection-start-column="37" selection-end-line="172" selection-end-column="37" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustomWidget.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="615">
+              <caret line="179" column="27" lean-forward="false" selection-start-line="179" selection-start-column="23" selection-end-line="179" selection-end-column="27" />
+              <folding>
+                <element signature="e#161#185#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>QMainWindow</find>
+      <find>QtGui</find>
+      <find>QIcon</find>
+      <find>QWid</find>
+      <find>QtWidget</find>
+      <find>groupBox</find>
+      <find>iconp</find>
+      <find>QLabel</find>
+      <find>green</find>
+      <find>icon</find>
+      <find>callsInThis</find>
+      <find>idaapi</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/OptionsWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ScratchPadWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/VulnDetectionWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/ImportExport.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/helpers/Misc.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/BinaryAnalysis.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py" />
+        <option value="$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="1906" />
+    <option name="width" value="1948" />
+    <option name="height" value="2098" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
+              <item name="helpers" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JARVIS" type="462c0819:PsiDirectoryNode" />
+              <item name="IDAPlugin" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="jarvis" type="462c0819:PsiDirectoryNode" />
+              <item name="widgets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JARVIS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="JARVIS" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="JARVIS" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="PyDebuggerOptionsProvider">
+    <option name="myPyQtBackend" value="PyQt5" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cdebc03a-cfc4-48ee-aad3-420a9a9419a6" name="Default" comment="" />
+      <created>1508361479686</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1508361479686</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-16" y="-16" width="3872" height="2116" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.114171125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294766" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294766" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="9" column="25" lean-forward="false" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2652">
+          <caret line="87" column="25" lean-forward="false" selection-start-line="87" selection-start-column="25" selection-end-line="87" selection-end-column="25" />
+          <folding>
+            <element signature="e#102#119#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="975">
+          <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding>
+            <element signature="e#133#157#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="9" column="17" lean-forward="false" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+          <folding>
+            <element signature="e#161#185#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3471">
+          <caret line="93" column="0" lean-forward="true" selection-start-line="93" selection-start-column="0" selection-end-line="93" selection-end-column="0" />
+          <folding>
+            <element signature="e#131#160#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="10" column="28" lean-forward="false" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
+          <folding>
+            <element signature="e#104#120#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="897">
+          <caret line="23" column="33" lean-forward="false" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
+          <folding>
+            <element signature="e#102#119#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis_launcher.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="16" column="57" lean-forward="true" selection-start-line="16" selection-start-column="57" selection-end-line="16" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="457">
+          <caret line="157" column="21" lean-forward="false" selection-start-line="157" selection-start-column="18" selection-end-line="157" selection-end-column="21" />
+          <folding>
+            <element signature="e#102#119#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/Config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-157807792/PyQt5/QtWidgets/QAction.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10842">
+          <caret line="279" column="8" lean-forward="false" selection-start-line="279" selection-start-column="8" selection-end-line="279" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-157807792/PyQt5/QtWidgets/QWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="11" column="6" lean-forward="false" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-157807792/PyQt5/QtWidgets/QLayout.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="588">
+          <caret line="34" column="8" lean-forward="false" selection-start-line="34" selection-start-column="8" selection-end-line="34" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/OptionsWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3599">
+          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding>
+            <element signature="e#145#176#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ScratchPadWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2886">
+          <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
+          <folding>
+            <element signature="e#110#126#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/VulnDetectionWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="63" column="21" lean-forward="true" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
+          <folding>
+            <element signature="e#132#156#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/ImportExportWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4407">
+          <caret line="31" column="38" lean-forward="false" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="38" />
+          <folding>
+            <element signature="e#104#120#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/ImportExport.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="769">
+          <caret line="172" column="37" lean-forward="false" selection-start-line="172" selection-start-column="37" selection-end-line="172" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/CustomWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="179" column="27" lean-forward="false" selection-start-line="179" selection-start-column="23" selection-end-line="179" selection-end-column="27" />
+          <folding>
+            <element signature="e#161#185#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/helpers/Misc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="299" column="48" lean-forward="false" selection-start-line="299" selection-start-column="48" selection-end-line="299" selection-end-column="48" />
+          <folding>
+            <element signature="e#112#129#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/helpers/Rizzo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-14625">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/FirmwareWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1024">
+          <caret line="92" column="62" lean-forward="true" selection-start-line="92" selection-start-column="62" selection-end-line="92" selection-end-column="62" />
+          <folding>
+            <element signature="e#131#160#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/Firmware.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1354">
+          <caret line="40" column="20" lean-forward="false" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="20" />
+          <folding>
+            <element signature="e#99#116#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/core/BinaryAnalysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="545">
+          <caret line="45" column="41" lean-forward="false" selection-start-line="45" selection-start-column="41" selection-end-line="45" selection-end-column="41" />
+          <folding>
+            <element signature="e#170#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IDAPlugin/jarvis/jarvis/widgets/BinaryAnalysisWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="613">
+          <caret line="512" column="0" lean-forward="true" selection-start-line="512" selection-start-column="0" selection-end-line="512" selection-end-column="0" />
+          <folding>
+            <element signature="e#133#157#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
