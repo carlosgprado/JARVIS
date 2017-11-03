@@ -297,7 +297,7 @@ class importManager():
                         continue
 
                     # Check if caller is a THUNK
-                    if import_caller_fn.flags & idaapi.FUNC_THUNK:
+                    if import_caller_fn.flags & FUNC_THUNK:
                         # It is a thunk: Not very interesting.
                         # Who is calling this thunk?
                         for thunk_caller in XrefsTo(import_caller_addr, 1):

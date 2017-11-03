@@ -7,7 +7,7 @@ class jarvis_launcher_t(idaapi.plugin_t):
 
     help = "Convenience Launcher for JARVIS"
     wanted_name = "JARVIS Launcher"
-    wanted_hotkey = "Alt-J"
+    wanted_hotkey = "Ctrl-J"
 
     def init(self):
         idaapi.msg("JARVIS launcher initialized\n")

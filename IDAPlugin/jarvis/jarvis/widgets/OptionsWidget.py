@@ -5,24 +5,24 @@
 # These are stored in the "main" config object
 #
 
-from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon, QSpinBox
-from PySide.QtGui import QCheckBox, QLabel
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QSpinBox, QWidget, QGroupBox
+from PyQt5.QtWidgets import QCheckBox, QLabel, QGridLayout, QVBoxLayout
 
 
 #################################################################
-class OptionsWidget(QtGui.QWidget):
+class OptionsWidget(QWidget):
 
     def __init__(self, parent):
         """
         Constructor
         """
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         self.parent = parent
         self.name = "Options"
         self.config = self.parent.config
-        self.iconp = self.config.icons_path
-        self.icon = QIcon(self.iconp + 'options.png')
+        self.icon_path = self.config.icons_path
+        self.icon = QtGui.QIcon(self.icon_path + 'options.png')
 
         self._createGui()
 
@@ -30,10 +30,10 @@ class OptionsWidget(QtGui.QWidget):
         """
         Grid layout containing groupBoxes
         """
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
 
-        grid.addWidget(self.createBinaryOptions(), 0, 0)
-        grid.addWidget(self.createVulnOptions(), 0, 1)
+        grid.addWidget(self.createBinaryOptions())
+        grid.addWidget(self.createVulnOptions())
 
         self.setLayout(grid)
 
@@ -41,7 +41,7 @@ class OptionsWidget(QtGui.QWidget):
         """
         Binary Analysis Options
         """
-        groupBox = QtGui.QGroupBox('Binary Analysis')
+        group_box = QGroupBox('Binary Analysis')
 
         # Elements
         cbs_unique_str = QCheckBox('Show unique strings', self)
@@ -73,10 +73,10 @@ class OptionsWidget(QtGui.QWidget):
         cbs_unique_com.stateChanged.connect(self.comment_unique)
         cbs_unique_calls.stateChanged.connect(self.calls_unique)
         cbs_entropy.stateChanged.connect(self.string_entropy)
-        sb_cutoff.valueChanged[int].connect(self.set_cutoff)
-        sb_cutoff.valueChanged[int].connect(self.set_func_cutoff)
+        sb_cutoff.valueChanged.connect(self.set_cutoff)
+        sb_cutoff.valueChanged.connect(self.set_func_cutoff)
 
-        vbox = QtGui.QVBoxLayout()
+        vbox = QVBoxLayout()
         vbox.addWidget(cbs_unique_str)
         vbox.addWidget(cbs_unique_com)
         vbox.addWidget(cbs_unique_calls)
@@ -87,19 +87,18 @@ class OptionsWidget(QtGui.QWidget):
         vbox.addWidget(sbf_cutoff)
         vbox.addStretch(1)
 
-        groupBox.setLayout(vbox)
+        group_box.setLayout(vbox)
 
-        return groupBox
+        return group_box
 
     def createVulnOptions(self):
         """
         Vulnerability Discovery related
         """
-        groupBox = QtGui.QGroupBox('Vulnerability Discovery')
+        group_box = QGroupBox('Vulnerability Discovery')
 
         # Elements
         cbv_deep_dang = QCheckBox('Deep search for dangerous functions')
-        # xxx = QCheckBox('blah')
 
         # Default states are read from the Options
         # class and reflected in the GUI
@@ -109,14 +108,13 @@ class OptionsWidget(QtGui.QWidget):
         # Connect elements and signals
         cbv_deep_dang.stateChanged.connect(self.deep_dangerous)
 
-        vbox = QtGui.QVBoxLayout()
+        vbox = QVBoxLayout()
         vbox.addWidget(cbv_deep_dang)
-        # vbox.addWidget(xxx)
         vbox.addStretch(1)
 
-        groupBox.setLayout(vbox)
+        group_box.setLayout(vbox)
 
-        return groupBox
+        return group_box
 
     ##########################################################################
     # GUI callbacks
@@ -153,6 +151,5 @@ class OptionsWidget(QtGui.QWidget):
         """
         if option:
             return QtCore.Qt.Checked
-
         else:
             return QtCore.Qt.Unchecked

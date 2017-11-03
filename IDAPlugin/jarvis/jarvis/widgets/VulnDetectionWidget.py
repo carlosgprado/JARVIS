@@ -5,9 +5,10 @@
 #
 
 
-from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon
-from PySide.QtGui import QTableWidgetItem, QTreeWidgetItem
+from PyQt5 import QtCore
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QTableWidgetItem, QTreeWidgetItem
 
 from jarvis.widgets.CustomWidget import CustomWidget
 import jarvis.core.helpers.Misc as misc
@@ -24,7 +25,7 @@ class VulnDetectionWidget(CustomWidget):
         self.name = "Bug Hunting"
         self.parent = parent
         self.config = self.parent.config
-        self.icon = QIcon(self.iconp + 'vuln_detection.png')
+        self.icon = QIcon(self.icon_path + 'vuln_detection.png')
 
         # Functionality associated with this widget
         self.vd = parent.vuln_detection
@@ -51,19 +52,17 @@ class VulnDetectionWidget(CustomWidget):
 
     def _createToolBarActions(self):
 
-        self.bannedAction = QtGui.QAction(
-                QIcon(self.iconp + 'banned_ms_functions.png'),
+        self.bannedAction = QAction(
+                QIcon(self.icon_path + 'banned_ms_functions.png'),
                 '&Usage of functions banned by Microsoft',
-                self,
-                triggered = self._showBannedFunctions
-                )
+                self)
+        self.bannedAction.triggered.connect(self._showBannedFunctions)
 
-        self.integerAction = QtGui.QAction(
-                QIcon(self.iconp + 'integer_issues.png'),
+        self.integerAction = QAction(
+                QIcon(self.icon_path + 'integer_issues.png'),
                 '&Search the whole binary for possible integer issues',
-                self,
-                triggered = self._showIntegerIssues
-                )
+                self)
+        self.integerAction.triggered.connect(self._showIntegerIssues)
 
         self.toolbar.addAction(self.bannedAction)
         self.toolbar.addAction(self.integerAction)
@@ -114,14 +113,13 @@ class VulnDetectionWidget(CustomWidget):
 
         try:
             integer_issues_ins = self.ii.search_integer_issues()
-
         except NotImplementedError:
             self._console_output("[!] x86_64 not implemented yet", err = True)
             return
 
         # Is there any integer issues at all?
-        nrows = len(integer_issues_ins)
-        if not nrows:
+        nr_rows = len(integer_issues_ins)
+        if not nr_rows:
             self._console_output("[-] No integer issues found.")
             return
 

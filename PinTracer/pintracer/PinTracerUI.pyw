@@ -8,10 +8,10 @@ import process_json_traces as pjt
 
 from PySide import QtGui
 from PySide import QtCore
-from PySide.QtGui import QApplication, QMainWindow, QStatusBar, QIcon, QRadioButton
-from PySide.QtGui import QWidget, QGroupBox, QPushButton, QLineEdit, QComboBox
-from PySide.QtGui import QFormLayout, QLabel, QProgressBar, QMessageBox
-from PySide.QtGui import QVBoxLayout, QHBoxLayout, QStyle, QCheckBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QIcon, QRadioButton
+from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QLineEdit, QComboBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QProgressBar, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QStyle, QCheckBox
 
 
 
@@ -154,8 +154,8 @@ class MainWindow(QMainWindow):
         This is the GUI heart
         """
         self.centralWidget = QWidget()
-        hLayout = QtGui.QHBoxLayout(self)
-        vLayout = QtGui.QVBoxLayout(self)
+        hLayout = QHBoxLayout(self)
+        vLayout = QVBoxLayout(self)
 
         hLayout.addWidget(self.executableGB())
 
@@ -174,7 +174,7 @@ class MainWindow(QMainWindow):
 
         # Define Actions here. They translate roughly
         # to "buttons" in the GUI
-        self.startAction = QtGui.QAction(
+        self.startAction = QAction(
                 QIcon('icons/play.png'),
                 '&Start tracing with selected options',
                 self,
@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
                 triggered = self.startTracing
                 )
 
-        self.pauseAction = QtGui.QAction(
+        self.pauseAction = QAction(
                 QIcon('icons/pause.png'),
                 '&Pause Tracing',
                 self,
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
                 triggered = self.pauseTracing
                 )
 
-        self.stopAction = QtGui.QAction(
+        self.stopAction = QAction(
                 QIcon('icons/stop.png'),
                 '&Stop Tracing completely',
                 self,
@@ -201,7 +201,7 @@ class MainWindow(QMainWindow):
                 triggered = self.stopTracing
                 )
 
-        self.optionsAction = QtGui.QAction(
+        self.optionsAction = QAction(
                 QIcon('icons/options-edit.png'),
                 '&Configure program options',
                 self,
@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
                 triggered = self.editOptions
                 )
 
-        self.logAction = QtGui.QAction(
+        self.logAction = QAction(
                 QIcon('icons/log.png'),
                 '&Show runtime log',
                 self,
@@ -219,7 +219,7 @@ class MainWindow(QMainWindow):
                 triggered = self.showLog
                 )
 
-        self.aboutAction = QtGui.QAction(
+        self.aboutAction = QAction(
                 QIcon('icons/info.png'),
                 '&About this program',
                 self,
@@ -228,7 +228,7 @@ class MainWindow(QMainWindow):
                 triggered = self.showAbout
                 )
 
-        self.quitAction = QtGui.QAction(
+        self.quitAction = QAction(
                 QIcon('icons/close.png'),
                 '&Close this program',
                 self,

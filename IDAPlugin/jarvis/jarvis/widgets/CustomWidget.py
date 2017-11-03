@@ -6,10 +6,12 @@
 # NOTE: Do not die trying to be very smart
 #
 
-from PySide import QtGui, QtCore
-from PySide.QtGui import QIcon, QColor
-from PySide.QtGui import QTextEdit, QSplitter
-from PySide.QtGui import QTableWidget, QTreeWidget
+from PyQt5 import QtCore
+from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtWidgets import QMainWindow, QWidget
+from PyQt5.QtWidgets import QTextEdit, QSplitter
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QTreeWidget
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QMenu
 
 from jarvis.core.helpers.Misc import jump_to_address
 from jarvis.Config import JConfig
@@ -17,19 +19,19 @@ from jarvis.core.helpers.InfoUI import InfoUI
 
 
 #################################################################
-class CustomWidget(QtGui.QMainWindow):
+class CustomWidget(QMainWindow):
 
     def __init__(self):
         """
         Constructor
         """
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.name = "Custom widget"
-        self.central_widget = QtGui.QWidget()
+        self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
         # TODO: This is ugly, improve it
-        self.iconp = JConfig().icons_path
+        self.icon_path = JConfig().icons_path
 
         self._createLayout()
 
@@ -59,9 +61,9 @@ class CustomWidget(QtGui.QMainWindow):
         """
 
         # Layouts (This is a common disposition)
-        main_layout = QtGui.QVBoxLayout()
-        self.button_layout = QtGui.QHBoxLayout()
-        output_layout = QtGui.QVBoxLayout()
+        main_layout = QVBoxLayout()
+        self.button_layout = QHBoxLayout()
+        output_layout = QVBoxLayout()
 
         # You will need to create your buttons
         # and add them to your layout like this:
@@ -86,7 +88,7 @@ class CustomWidget(QtGui.QMainWindow):
         Some binary analysis commands will output to this.
         """
 
-        self.output_label = QtGui.QLabel('Output')
+        self.output_label = QLabel('Output')
 
         self.output_window = QTextEdit()
         self.output_window.setFontPointSize(10)
@@ -99,7 +101,7 @@ class CustomWidget(QtGui.QMainWindow):
         A vanilla QTableWidget. Callbacks modify
         its properties, like number of columns, etc.
         """
-        self.table_label = QtGui.QLabel('Table Output')
+        self.table_label = QLabel('Table Output')
 
         self.table = QTableWidget()
         self.table.setColumnCount(3)
@@ -120,7 +122,7 @@ class CustomWidget(QtGui.QMainWindow):
         A QtreeWidget. Initially used to display those pesky
         dword comparison to immediate values.
         """
-        self.tree_label = QtGui.QLabel('Tree Output')
+        self.tree_label = QLabel('Tree Output')
 
         self.tree = QTreeWidget()
         self.tree.setColumnCount(3)
@@ -170,17 +172,17 @@ class CustomWidget(QtGui.QMainWindow):
         Popup menu activated clicking the secondary
         button on the table
         """
-        menu = QtGui.QMenu()
+        menu = QMenu()
 
         # Add menu entries
-        delRow = menu.addAction(QIcon(self.iconp + "close.png"), "Delete Row")
+        delRow = menu.addAction(QIcon(self.icon_path + "close.png"), "Delete Row")
         selItem = menu.addAction(
-            QIcon(self.iconp + "bookmark.png"), "Mark entry")
+            QIcon(self.icon_path + "bookmark.png"), "Mark entry")
         menu.addSeparator()
         origFunc = menu.addAction(
-            QIcon(self.iconp + "lightning.png"), "Select origin function")
+            QIcon(self.icon_path + "lightning.png"), "Select origin function")
         destFunc = menu.addAction(
-            QIcon(self.iconp + "flag.png"), "Select destination function")
+            QIcon(self.icon_path + "flag.png"), "Select destination function")
 
         # Get entry clicked
         action = menu.exec_(self.mapToGlobal(pos))
@@ -190,23 +192,21 @@ class CustomWidget(QtGui.QMainWindow):
             self.table.removeRow(self.table.currentRow())
 
         elif action == selItem:
-            self.table.currentItem().setBackground(QtGui.QColor('red'))
+            self.table.currentItem().setBackground(QColor('red'))
 
         elif action == origFunc:
             try:
                 addr = self.table.currentItem().text()
                 InfoUI.function_orig_ea = int(addr, 16)
-
-            except:
-                self._console_output("This does not look like an address...", err = True)
+            except Exception as e:
+                self._console_output("[!] That does not look like an address...", err = True)
 
         elif action == destFunc:
             try:
                 addr = self.table.currentItem().text()
                 InfoUI.function_dest_ea = int(addr, 16)
-
-            except:
-                self._console_output("This does not look like an address...", err = True)
+            except Exception as e:
+                self._console_output("[!] That does not look like an address...", err = True)
 
     def _tableHeaderDoubleClicked(self, index):
         """
@@ -224,14 +224,13 @@ class CustomWidget(QtGui.QMainWindow):
             addr_int = int(item.text(column), 16)
             jump_to_address(addr_int)
             # Paint some color
-            item.setBackground(column, QtGui.QColor('green'))
-
-        except:
+            item.setBackground(column, QColor('green'))
+        except Exception as e:
             self._console_output("[!] That does not look like an address...", err = True)
 
 
 #################################################################
-class NumQTableWidgetItem(QtGui.QTableWidgetItem):
+class NumQTableWidgetItem(QTableWidgetItem):
     """
     Overload __lt__ to be able to sort numerically
     Default sorting is alphabetically
