@@ -14,7 +14,9 @@ class jarvis_launcher_t(idaapi.plugin_t):
         return idaapi.PLUGIN_OK
 
     def run(self, arg):
-        idaapi.load_and_run_plugin('jarvis\jarvis.py', 0)
+        jarvis_loc = os.path.join('plugins', 'jarvis', 'jarvis.py')
+        full_path = idaapi.idadir(jarvis_loc)
+        idaapi.load_and_run_plugin(full_path, 0)
 
     def term(self):
         pass
