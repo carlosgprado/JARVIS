@@ -92,26 +92,24 @@ class BinaryAnalysis():
         Get all references to strings within the current function
         @return: list of tuples [(xref addr, s), ...]
         """
-        f = get_func(ScreenEA())
+        f = get_func(here())
         if not f:
             # get_func returned None
             print '[x] This does not look like a function...'
             return []
 
-        start = f.startEA
-        end = f.endEA
-
         s_refs = []
 
-        # TODO: This algorithm can be improved :)
-        # For now I will make do
-        for s_ea, s in self.cache.string_list:
-            # Calculate xrefs
-            for ref in XrefsTo(s_ea, True):
-                ref_addr = ref.frm
-                # Within current function?
-                if ref_addr >= start and ref_addr <= end:
-                    s_refs.append((ref_addr, s))
+        for ins_ea in FuncItems(f.startEA):
+            for xref in XrefsFrom(ins_ea, True):
+                if xref.type != 1: # Data_Offset
+                    continue
+
+                to = xref.to
+                for s_ea, s in self.cache.string_list:
+                    # Gotta love unpacking
+                    if to == s_ea:
+                        s_refs.append((xref.frm, s))
 
         return s_refs
 
