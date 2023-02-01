@@ -21,7 +21,7 @@ def to_str(unicode_or_string):
     :param unicode_or_string: exactly that
     :return: an instance of str
     """
-    if isinstance(unicode_or_string, unicode):
+    if isinstance(unicode_or_string, str):
         value = unicode_or_string.encode('utf-8')
 
     else:
@@ -56,7 +56,7 @@ def module_boundaries():
     :return: boundaries
     """
 
-    return (MinEA(), MaxEA())
+    return (inf_get_min_ea(), inf_get_max_ea())
 
 
 #################################################################
@@ -76,7 +76,7 @@ def function_boundaries(ea = None):
         return (None, None)
 
     else:
-        return (f.startEA, f.endEA)
+        return (f.start_ea, f.end_ea)
 
 
 #################################################################
@@ -86,7 +86,7 @@ def iter_disasm():
     Returns all disassembly within a function
     """
 
-    for ins in FuncItems(ScreenEA()):
+    for ins in FuncItems(get_screen_ea()):
         yield (ins, GetDisasm(ins))
 
 
@@ -101,19 +101,20 @@ def is_external_jmp(ins_ea):
     """
     # TODO: Check if this is accurate (unit tests? :))
 
-    decode_insn(ins_ea)
+    cmd = insn_t()	
+    decode_insn(cmd, ins_ea)
 
     if cmd.itype == NN_jmpni:
-        target = GetOperandValue(ins_ea, 0)
+        target = get_operand_value(ins_ea, 0)
         # TODO: This is valid for PE format only
         # Is this a thunk?
-        if SegName(target) == '.idata':
+        if get_segm_name(target) == '.idata':
             return True
 
     if cmd.itype == NN_jmp:
-        # HACK: GetOperandValue returns the target
+        # HACK: get_operand_value returns the target
         # address, not the offset (as I would expect)
-        target = GetOperandValue(ins_ea, 0)
+        target = get_operand_value(ins_ea, 0)
         (s, e) = function_boundaries(ins_ea)
 
         if target < s or target > e:
@@ -129,10 +130,10 @@ def jump_to_address(addr):
     Convenience function
     """
     try:
-        idc.Jump(addr)
+        idc.jumpto(addr)
 
     except:
-        print traceback.format_exc()
+        print(traceback.format_exc())
 
 
 #################################################################
@@ -143,11 +144,11 @@ def get_function_name(addr=None):
     the name of the current function.
     """
     if not addr:
-        addr = ScreenEA()
+        addr = get_screen_ea()
 
-    name = GetFunctionName(addr)
+    name = get_func_name(addr)
 
-    # GetFunctionName returns empty string
+    # get_func_name returns empty string
     # on failure, hex(addr) is better than nothing
     if not name:
         name = "%x" % addr
@@ -161,7 +162,7 @@ def name_to_address(name):
     Convenience function.
     Return function StartEA or 0xFFFFFFFF
     """
-    return LocByName(name)
+    return get_name_ea_simple(name)
 
 
 #################################################################
@@ -182,7 +183,7 @@ def get_platform():
         return pl_dict[p]
 
     else:
-        raise 'Architecture NOT supported'
+        raise Exception('Architecture NOT supported')
 
 
 #################################################################
@@ -200,7 +201,7 @@ def get_code_section_address():
     Name says it all :)
     """
     for seg_ea in Segments():
-        if SegName(seg_ea) == '.text':
+        if get_segm_name(seg_ea) == '.text':
             return seg_ea
 
     return None
@@ -239,11 +240,11 @@ def paint_basic_blocks(addr, color = None):
 
     for addr in addr_l:
         for bb in fc:
-            # Remember that bb.endEA is bb.startEA of the next one!
-            if addr >= bb.startEA and addr < bb.endEA:
+            # Remember that bb.end_ea is bb.start_ea of the next one!
+            if addr >= bb.start_ea and addr < bb.end_ea:
                 # This is the one
-                for ins in Heads(bb.startEA, bb.endEA):
-                    SetColor(ins, CIC_ITEM, color)
+                for ins in Heads(bb.start_ea, bb.end_ea):
+                    set_color(ins, CIC_ITEM, color)
 
 
 #################################################################
@@ -252,7 +253,7 @@ def set_ins_color(addr, color=0x2020c0):
     A simple wrapper.
     It colors a single instruction.
     """
-    SetColor(addr, CIC_ITEM, color)
+    set_color(addr, CIC_ITEM, color)
 
 
 #################################################################
@@ -283,7 +284,7 @@ class importManager():
         importCallers = defaultdict(list)
         importPattern = re.compile(regexp, re.IGNORECASE)
 
-        for imp_name, imp_ea in self.import_dict.iteritems():
+        for imp_name, imp_ea in self.import_dict.items():
 
             # This dict has the *IAT names*
             # i.e. __imp_ReadFile, within the .idata section
@@ -306,14 +307,14 @@ class importManager():
                             if not thunk_caller_fn:
                                 continue
 
-                            import_caller_ea = thunk_caller_fn.startEA
+                            import_caller_ea = thunk_caller_fn.start_ea
                             # Remove nasty duplicates
                             if imp_ea not in importCallers[import_caller_ea]:
                                 importCallers[import_caller_ea].append(imp_ea)
 
                     else:
                         # It is NOT a thunk, no need for recursion
-                        import_caller_ea = import_caller_fn.startEA
+                        import_caller_ea = import_caller_fn.start_ea
                         # Remove nasty duplicates
                         if imp_ea not in importCallers[import_caller_ea]:
                             importCallers[import_caller_ea].append(imp_ea)
@@ -328,14 +329,14 @@ class importManager():
         @rtype: dictionary
         @return: dictionary containing import name & address {"name" : imp_ea}
         """
-        print "= [*] Populating imports dictionary..."
+        print("= [*] Populating imports dictionary...")
 
         nimps = get_import_module_qty()  # How many modules imported?
 
-        for i in xrange(0, nimps):
+        for i in range(0, nimps):
             name = get_import_module_name(i)
             if not name:
-                print "[x] Could not get import module name for #%d" % i
+                print("[x] Could not get import module name for #%d" % i)
                 continue
 
             # The import_dict dictionary will be filled
@@ -370,7 +371,7 @@ class importManager():
         @return: name (if successful) or same argument (on failure)
         """
 
-        for k, v in self.import_dict.iteritems():
+        for k, v in self.import_dict.items():
             if v == iaddr:
                 name = k
                 break
@@ -392,7 +393,7 @@ def entropy(s):
     """
     H = 0.0
 
-    for c in xrange(256):
+    for c in range(256):
         if s.count(chr(c)) > 0:
             H += -1.0 * p(c, s) * math.log(p(c, s), 2)
 

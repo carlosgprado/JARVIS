@@ -33,7 +33,7 @@ def backtrace_args_x86(ea, nr_args):
     """
 
     if idc.__EA64__:
-        raise "Use 64 bit version!"
+        raise Exception("Use 64 bit version!")
 
     #
     # x86 is a bit trickier.
@@ -51,7 +51,7 @@ def backtrace_args_x86(ea, nr_args):
 
         if pi.get_canon_mnem() == 'push':
             nr_args -= 1
-            push_op = GetOpnd(pi.ea, 0)
+            push_op = print_operand(pi.ea, 0)
             arg_list.append((push_op, pi.ea))
 
         prev_addr = pi.ea

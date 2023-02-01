@@ -48,10 +48,10 @@ def patch_binary():
 
     if r != 0:
         # Error. Possibly no patched bytes
-        print "visit_patched_bytes() returned %d" % r
+        print("visit_patched_bytes() returned %d" % r)
         return None
 
-    filename = AskFile(1, "*.*", "Original file to patch?")
+    filename = ask_file(1, "*.*", "Original file to patch?")
 
     if not filename:
         # For example, file dialog was closed

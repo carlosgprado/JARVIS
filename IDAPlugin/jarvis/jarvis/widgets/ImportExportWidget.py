@@ -124,7 +124,7 @@ class ImportExportWidget(CustomWidget):
         # TODO: This could be better in a QTree or maybe adding
         # a drop down menu to select the thread id...
         idx = 0
-        for tid, call_list in imported_info_dict.iteritems():
+        for tid, call_list in imported_info_dict.items():
             self._console_output("Processing Thread ID %d" % tid)
 
             for u_ea, v_ea in call_list:

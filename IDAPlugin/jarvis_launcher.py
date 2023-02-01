@@ -1,4 +1,5 @@
 import idaapi
+import os
 
 
 class jarvis_launcher_t(idaapi.plugin_t):

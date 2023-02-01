@@ -20,7 +20,7 @@ class VulnDetection():
 
     def __init__(self):
 
-        print "= Loading vulnerability detection module..."
+        print("= Loading vulnerability detection module...")
 
         # Since this is pretty demanded information
         # let's calculate it here
@@ -35,7 +35,7 @@ class VulnDetection():
         """
         # TODO: actually write some code here :)
 
-        for n in self.im.import_dict.iterkeys():
+        for n in self.im.import_dict.keys():
             if n.lower() in dangerous_funcs:
                 # This is an "interesting" import
                 pass
@@ -49,7 +49,7 @@ class VulnDetection():
         dang_funcnames = []
 
         for f_ea in Functions():
-            f_name = GetFunctionName(f_ea)
+            f_name = get_func_name(f_ea)
 
             for dang_name in misc.banned_functions:
                 # skip those pesky secure functions
@@ -74,9 +74,9 @@ class VulnDetection():
             # Calculate the cache for the first time
             self.cache.banned_refs = dict()
 
-            for n in self.im.import_dict.iterkeys():
+            for n in self.im.import_dict.keys():
                 if n.lower() in misc.banned_functions:
-                    func_addr = LocByName(n)
+                    func_addr = get_name_ea_simple(n)
                     if func_addr == BADADDR:
                         continue
 
@@ -87,7 +87,7 @@ class VulnDetection():
             if deep_search:
                 # Add to the list the (possibly) inlined functions
                 for m in self.find_dangerous_function_names():
-                    func_addr = LocByName(m)
+                    func_addr = get_name_ea_simple(m)
                     self.cache.banned_refs[m] = list(CodeRefsTo(func_addr, True))
 
         return self.cache.banned_refs

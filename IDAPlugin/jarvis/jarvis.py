@@ -7,6 +7,7 @@
 from idc import *
 from idautils import *
 from idaapi import *
+import idaapi
 
 from PyQt5.QtWidgets import QTabWidget, QVBoxLayout
 from PyQt5.QtGui import QIcon
@@ -56,7 +57,7 @@ class JarvisPluginForm(PluginForm):
                 "= Jarvis starting...\n\n"
                 )
 
-        print banner
+        print(banner)
 
     def OnCreate(self, form):
         """
@@ -74,7 +75,7 @@ class JarvisPluginForm(PluginForm):
         """
         Initializes all internal functionality
         """
-        print "* Instantiating core modules...\n"
+        print("* Instantiating core modules...\n")
 
         self.binary_analysis = BinaryAnalysis()
         self.vuln_detection = VulnDetection()
@@ -85,7 +86,7 @@ class JarvisPluginForm(PluginForm):
         """
         Instantiates all widgets
         """
-        print "* Creating / Loading individual widgets..."
+        print("* Creating / Loading individual widgets...")
 
         # TODO: programmatically load the desired widgets
         # Append to the list every widget you have
@@ -127,9 +128,9 @@ class JarvisPluginForm(PluginForm):
         return PluginForm.Show(self,
             ":: JARVIS ::",
             options = (
-                PluginForm.FORM_CLOSE_LATER |
-                PluginForm.FORM_RESTORE |
-                PluginForm.FORM_SAVE
+                PluginForm.WCLS_CLOSE_LATER |
+                PluginForm.WOPN_RESTORE |
+                PluginForm.WCLS_SAVE
                 )
             )
 
@@ -137,7 +138,7 @@ class JarvisPluginForm(PluginForm):
         """
         Perform some cleanup here, if necessary
         """
-        print "* JarvisPluginForm closed *"
+        print("* JarvisPluginForm closed *")
 
 
 #################################################################
@@ -160,7 +161,7 @@ class JarvisPlugin(plugin_t):
         f.Show()
 
     def term(self):
-        idaapi.msg("[*] JarvisPlugin terminated")
+        msg("[*] JarvisPlugin terminated")
 
 
 #################################################################

@@ -18,17 +18,17 @@ from jarvis.core.helpers.Codatify import Codatify
 class Firmware():
 
     def __init__(self):
-        print "= Loading Firmware module..."
+        print("= Loading Firmware module...")
 
     def rizzo_produce(self, say):
-        fname = AskFile(1, "*.riz", "Save signature file as")
+        fname = ask_file(1, "*.riz", "Save signature file as")
         if fname:
             if '.' not in fname:
                 fname += ".riz"
             return RizzoBuild(say, fname)
 
     def rizzo_load(self, say):
-        fname = AskFile(0, "*.riz", "Load signature file")
+        fname = ask_file(0, "*.riz", "Load signature file")
         if fname:
             return RizzoApply(say, fname)
 

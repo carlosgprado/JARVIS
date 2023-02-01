@@ -60,16 +60,16 @@ class RizzoSignatures(object):
             return
 
         print("\n\nGENERATED FORMAL SIGNATURES FOR:")
-        for (key, ea) in self.formal.iteritems():
+        for (key, ea) in self.formal.items():
             func = RizzoFunctionDescriptor(self.formal, self.functions, key)
             if func.name in self.SHOW:
-                print(func.name)
+                print((func.name))
 
         print("\n\nGENERATRED FUZZY SIGNATURES FOR:")
-        for (key, ea) in self.fuzzy.iteritems():
+        for (key, ea) in self.fuzzy.items():
             func = RizzoFunctionDescriptor(self.fuzzy, self.functions, key)
             if func.name in self.SHOW:
-                print(func.name)
+                print((func.name))
 
 class RizzoStringDescriptor(object):
     '''
@@ -164,16 +164,17 @@ class Rizzo(object):
         functions = []
         immediates = []
 
-        ea = block.startEA
-        while ea < block.endEA:
-            decode_insn(ea)
+        ea = block.start_ea
+        while ea < block.end_ea:
+            cmd = insn_t()
+            decode_insn(cmd, ea)
 
             # Get a list of all data/code references from the current instruction
             drefs = [x for x in DataRefsFrom(ea)]
             crefs = [x for x in CodeRefsFrom(ea, False)]
 
             # Add all instruction mnemonics to the formal block hash
-            formal.append(GetMnem(ea))
+            formal.append(print_insn_mnem(ea))
 
             # If this is a call instruction, be sure to note the name of the function
             # being called. This is used to apply call-based signatures to functions.
@@ -185,7 +186,7 @@ class Rizzo(object):
             # specific than just saying that a call was made.
             if is_call_insn(ea):
                 for cref in crefs:
-                    func_name = Name(cref)
+                    func_name = get_name(cref)
                     if func_name:
                         functions.append(func_name)
                         fuzzy.append("funcref")
@@ -200,7 +201,7 @@ class Rizzo(object):
             # was referenced.
             elif drefs:
                 for dref in drefs:
-                    if self.strings.has_key(dref):
+                    if dref in self.strings:
                         formal.append(self.strings[dref].value)
                         fuzzy.append(self.strings[dref].value)
                     else:
@@ -213,16 +214,16 @@ class Rizzo(object):
             # that are greater than 65,535, are not memory addresses, and are not displayed as
             # negative values.
             elif not drefs and not crefs:
-                for n in range(0, len(cmd.Operands)):
-                    opnd_text = GetOpnd(ea, n)
+                for n in range(0, len(cmd.ops)):
+                    opnd_text = print_operand(ea, n)
                     formal.append(opnd_text)
-                    if cmd.Operands[n].type == o_imm and not opnd_text.startswith('-'):
-                        if cmd.Operands[n].value >= 0xFFFF:
-                            if getFlags(cmd.Operands[n].value) == 0:
-                                fuzzy.append(str(cmd.Operands[n].value))
-                                immediates.append(cmd.Operands[n].value)
+                    if cmd.ops[n].type == o_imm and not opnd_text.startswith('-'):
+                        if cmd.ops[n].value >= 0xFFFF:
+                            if get_full_flags(cmd.ops[n].value) == 0:
+                                fuzzy.append(str(cmd.ops[n].value))
+                                immediates.append(cmd.ops[n].value)
 
-            ea = NextHead(ea)
+            ea = next_head(ea, 18446744073709551615)
 
         return (self.sighash(''.join(formal)), self.sighash(''.join(fuzzy)), immediates, functions)
 
@@ -241,7 +242,7 @@ class Rizzo(object):
         signatures = RizzoSignatures()
 
         # Generate unique string-based function signatures
-        for (ea, string) in self.strings.iteritems():
+        for (ea, string) in self.strings.items():
             # Only generate signatures on reasonably long strings with one xref
             if len(string.value) >= 8 and len(string.xrefs) == 1:
                 func = get_func(string.xrefs[0])
@@ -251,11 +252,11 @@ class Rizzo(object):
                     # Check for and remove string duplicate signatures (the same
                     # string can appear more than once in an IDB).
                     # If no duplicates, add this to the string signature dict.
-                    if signatures.strings.has_key(strhash):
+                    if strhash in signatures.strings:
                         del signatures.strings[strhash]
                         signatures.stringdups.add(strhash)
                     elif strhash not in signatures.stringdups:
-                        signatures.strings[strhash] = func.startEA
+                        signatures.strings[strhash] = func.start_ea
 
         # Generate formal, fuzzy, and immediate-based function signatures
         for ea in Functions():
@@ -270,33 +271,33 @@ class Rizzo(object):
                 fuzzy = self.sighash(''.join([str(f) for (e, f, i, c) in blocks]))
 
                 # Add this signature to the function dictionary.
-                signatures.functions[func.startEA] = (Name(func.startEA), blocks)
+                signatures.functions[func.start_ea] = (get_name(func.start_ea), blocks)
 
                 # Check for and remove formal duplicate signatures.
                 # If no duplicates, add this to the formal signature dict.
-                if signatures.formal.has_key(formal):
+                if formal in signatures.formal:
                     del signatures.formal[formal]
                     signatures.formaldups.add(formal)
                 elif formal not in signatures.formaldups:
-                    signatures.formal[formal] = func.startEA
+                    signatures.formal[formal] = func.start_ea
 
                 # Check for and remove fuzzy duplicate signatures.
                 # If no duplicates, add this to the fuzzy signature dict.
-                if signatures.fuzzy.has_key(fuzzy):
+                if fuzzy in signatures.fuzzy:
                     del signatures.fuzzy[fuzzy]
                     signatures.fuzzydups.add(fuzzy)
                 elif fuzzy not in signatures.fuzzydups:
-                    signatures.fuzzy[fuzzy] = func.startEA
+                    signatures.fuzzy[fuzzy] = func.start_ea
 
                 # Check for and remove immediate duplicate signatures.
                 # If no duplicates, add this to the immediate signature dict.
                 for (e, f, immediates, c) in blocks:
                     for immediate in immediates:
-                        if signatures.immediates.has_key(immediate):
+                        if immediate in signatures.immediates:
                             del signatures.immediates[immediate]
                             signatures.immediatedups.add(immediate)
                         elif immediate not in signatures.immediatedups:
-                            signatures.immediates[immediate] = func.startEA
+                            signatures.immediates[immediate] = func.start_ea
 
         # These need not be maintained across function calls,
         # and only add to the size of the saved signature file.
@@ -318,8 +319,8 @@ class Rizzo(object):
 
         # Match formal function signatures
         start = time.time()
-        for (extsig, ext_func_ea) in extsigs.formal.iteritems():
-            if self.signatures.formal.has_key(extsig):
+        for (extsig, ext_func_ea) in extsigs.formal.items():
+            if extsig in self.signatures.formal:
                 newfunc = RizzoFunctionDescriptor(extsigs.formal, extsigs.functions, extsig)
                 curfunc = RizzoFunctionDescriptor(self.signatures.formal, self.signatures.functions, extsig)
                 formal[curfunc] = newfunc
@@ -328,8 +329,8 @@ class Rizzo(object):
 
         # Match fuzzy function signatures
         start = time.time()
-        for (extsig, ext_func_ea) in extsigs.fuzzy.iteritems():
-            if self.signatures.fuzzy.has_key(extsig):
+        for (extsig, ext_func_ea) in extsigs.fuzzy.items():
+            if extsig in self.signatures.fuzzy:
                 curfunc = RizzoFunctionDescriptor(self.signatures.fuzzy, self.signatures.functions, extsig)
                 newfunc = RizzoFunctionDescriptor(extsigs.fuzzy, extsigs.functions, extsig)
                 # Only accept this as a valid match if the functions have the same number of basic code blocks
@@ -340,8 +341,8 @@ class Rizzo(object):
 
         # Match string based function signatures
         start = time.time()
-        for (extsig, ext_func_ea) in extsigs.strings.iteritems():
-            if self.signatures.strings.has_key(extsig):
+        for (extsig, ext_func_ea) in extsigs.strings.items():
+            if extsig in self.signatures.strings:
                 curfunc = RizzoFunctionDescriptor(self.signatures.strings, self.signatures.functions, extsig)
                 newfunc = RizzoFunctionDescriptor(extsigs.strings, extsigs.functions, extsig)
                 strings[curfunc] = newfunc
@@ -350,8 +351,8 @@ class Rizzo(object):
 
         # Match immediate baesd function signatures
         start = time.time()
-        for (extsig, ext_func_ea) in extsigs.immediates.iteritems():
-            if self.signatures.immediates.has_key(extsig):
+        for (extsig, ext_func_ea) in extsigs.immediates.items():
+            if extsig in self.signatures.immediates:
                 curfunc = RizzoFunctionDescriptor(self.signatures.immediates, self.signatures.functions, extsig)
                 newfunc = RizzoFunctionDescriptor(extsigs.immediates, extsigs.functions, extsig)
                 immediates[curfunc] = newfunc
@@ -366,12 +367,12 @@ class Rizzo(object):
 
     def rename(self, ea, name):
         # Don't rely on the name in curfunc, as it could have already been renamed
-        curname = Name(ea)
+        curname = get_name(ea)
         # Don't rename if the name is a special identifier, or if the ea has already been named
         # TODO: What's a better way to check for reserved name prefixes?
         if curname.startswith('sub_') and name.split('_')[0] not in set(['sub', 'loc', 'unk', 'dword', 'word', 'byte']):
             # Don't rename if the name already exists in the IDB
-            if LocByName(name) == BADADDR:
+            if get_name_ea_simple(name) == BADADDR:
                 if MakeName(ea, name):
                     SetFunctionFlags(ea, (GetFunctionFlags(ea) | FUNC_LIB))
                     self.say("%s  =>  %s" % (curname, name))
@@ -390,8 +391,8 @@ class Rizzo(object):
             # Keeps track of all function names that we've identified candidate functions for
             rename = {}
 
-            for (curfunc, newfunc) in match.iteritems():
-                if not rename.has_key(newfunc.name):
+            for (curfunc, newfunc) in match.items():
+                if newfunc.name not in rename:
                     rename[newfunc.name] = []
 
                 # Attempt to rename this function
@@ -407,24 +408,24 @@ class Rizzo(object):
                         cblock = RizzoBlockDescriptor(cblock)
 
                         if cblock.match(nblock, fuzzy):
-                            if bm.has_key(cblock):
+                            if cblock in bm:
                                 del bm[cblock]
                                 duplicates.add(cblock)
                             elif cblock not in duplicates:
                                 bm[cblock] = nblock
 
                 # Rename known function calls from each unique identified code block
-                for (cblock, nblock) in bm.iteritems():
+                for (cblock, nblock) in bm.items():
                     for n in range(0, len(cblock.functions)):
-                        ea = LocByName(cblock.functions[n])
+                        ea = get_name_ea_simple(cblock.functions[n])
                         if ea != BADADDR:
-                            if rename.has_key(nblock.functions[n]):
+                            if nblock.functions[n] in rename:
                                 rename[nblock.functions[n]].append(ea)
                             else:
                                 rename[nblock.functions[n]] = [ea]
 
                 # Rename the identified functions
-                for (name, candidates) in rename.iteritems():
+                for (name, candidates) in rename.items():
                     if candidates:
                         winner = collections.Counter(candidates).most_common(1)[0][0]
                         count += self.rename(winner, name)

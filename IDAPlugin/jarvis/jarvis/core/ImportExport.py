@@ -22,7 +22,7 @@ class ImportExport():
 
     def __init__(self):
 
-        print "= Loading import / export module..."
+        print("= Loading import / export module...")
 
         self.ti = TraceImporter()
 
@@ -36,10 +36,10 @@ class ImportExport():
         begin, end = misc.function_boundaries()
 
         try:
-            filename = AskFile(1, "function_bytes.txt",
+            filename = ask_file(1, "function_bytes.txt",
                                "File to save the code?")
             code_s = ''.join([
-                "%02x" % get_byte(x) for x in xrange(begin, end)])
+                "%02x" % get_byte(x) for x in range(begin, end)])
             with open(filename, 'w') as f:
                 f.write(code_s)
 
@@ -56,7 +56,7 @@ class TraceImporter():
         Contains all the machinery used to import data
         from a PinTool trace
         """
-        print "= Loading TraceImporter..."
+        print("= Loading TraceImporter...")
         self.cache = TraceImporterCache()
 
     def get_image_base(self, filename):
@@ -81,7 +81,7 @@ class TraceImporter():
         "calls" : [{"tid": 0, "u": 0xcafe, "v": 0xbabe, "indirect": true}, ...]
         @return: d[thread_id] = [(u_ea, v_ea), ...]
         """
-        print "[*] Parsing file:", filename
+        print("[*] Parsing file:", filename)
         trace_d = defaultdict(list)
 
         with open(filename, 'r') as f:
@@ -93,7 +93,7 @@ class TraceImporter():
             thread_id = c['tid']
 
             # It would be better to filter at trace time
-            if u_ea > MaxEA() or v_ea > MaxEA():
+            if u_ea > inf_get_max_ea() or v_ea > inf_get_max_ea():
                 continue
 
             trace_d[thread_id].append((u_ea, v_ea))
@@ -108,13 +108,13 @@ class TraceImporter():
         Pretty straightforward, isn't it? ;)
         @return: dictionary d[tid] = [bb_ea, ...]
         """
-        filename = AskFile(1, "*.json", "File to import addresses from?")
+        filename = ask_file(1, "*.json", "File to import addresses from?")
 
         # Rebase
         image_base = self.get_image_base(filename)
         if not image_base:
-            print 'import_data() - Could not get image base from trace'
-            raise 'ImportFailure'
+            print('import_data() - Could not get image base from trace')
+            raise Excpetion('ImportFailure')
 
         ida_base = get_imagebase()  # idaapi
         delta = image_base - ida_base
@@ -127,7 +127,7 @@ class TraceImporter():
         # Parse basic blocks from file
         trace_dict = self.file_parser(filename)
 
-        for addr_list in trace_dict.values():
+        for addr_list in list(trace_dict.values()):
             for _, v_ea in addr_list:
                 misc.paint_basic_blocks(v_ea, bb_color)
 
@@ -140,7 +140,7 @@ class TraceImporter():
         """
         dyn_calls_dict = defaultdict(set)
 
-        filename = AskFile(1, "*.json", "File to import information from?")
+        filename = ask_file(1, "*.json", "File to import information from?")
 
         try:
             with open(filename, 'r') as f:
@@ -174,21 +174,21 @@ class TraceImporter():
             return
 
         # Add these calls to the IDB
-        for frm, to_list in dyn_calls_dict.iteritems():
+        for frm, to_list in dyn_calls_dict.items():
             for to in to_list:
-                AddCodeXref(frm, to, fl_CN)
+                add_cref(frm, to, fl_CN)
                 # TODO: Display the imported info in a table format?
-                print "Added CodeXrefs from {} to {}".format(hex(frm), hex(to))
+                print("Added CodeXrefs from {} to {}".format(hex(frm), hex(to)))
 
     def export_to_graphml(self):
         """
         GraphML is nice. Display with yed and enjoy.
         """
-        filename = AskFile(1, "*.graphml", "File to export to?")
+        filename = ask_file(1, "*.graphml", "File to export to?")
 
         if not filename:
             # For example, file dialog was closed
-            print 'Error getting filename'
+            print('Error getting filename')
             return None
 
         if self.cache.trace_d:
@@ -196,13 +196,13 @@ class TraceImporter():
             trace_d = self.cache.trace_d
 
         else:
-            print '[!] Could not find trace dictionary on cache'
+            print('[!] Could not find trace dictionary on cache')
             return None
 
         # TODO: working with tid 0 for now
         # Maybe just generate several filename_N.graphml?
         t0_list = trace_d[0]
-        edge_list = [map(lambda x: GetFunctionName(x), e) for e in t0_list]
+        edge_list = [[get_func_name(x) for x in e] for e in t0_list]
 
         return graphing.write_to_graphml(edge_list, filename)
 
