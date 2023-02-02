@@ -216,6 +216,8 @@ class Rizzo(object):
             elif not drefs and not crefs:
                 for n in range(0, len(cmd.ops)):
                     opnd_text = print_operand(ea, n)
+                    if opnd_text == None:
+                        continue
                     formal.append(opnd_text)
                     if cmd.ops[n].type == o_imm and not opnd_text.startswith('-'):
                         if cmd.ops[n].value >= 0xFFFF:
