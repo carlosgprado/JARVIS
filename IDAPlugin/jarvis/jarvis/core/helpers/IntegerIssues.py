@@ -45,8 +45,8 @@ class IntegerIssues():
         # Let's fill the dangerous funcs dict based only on name
         # TODO: maybe do something with FLIRT signatures or alike?
         for func_ea in Functions():
-            func_name = GetFunctionName(func_ea)
-            for pattern, dang_arg_idx in self.dangerous_patterns.iteritems():
+            func_name = get_func_name(func_ea)
+            for pattern, dang_arg_idx in self.dangerous_patterns.items():
                 if pattern in func_name:
                     # NOTE this is very relaxed. Names like
                     # memset_0 or __malloc will fit as well
@@ -57,7 +57,7 @@ class IntegerIssues():
                     for ref in XrefsTo(func_ea, 0):
                         self.dangerous_calls.add(ref.frm)
                         # Color the function call *RED*
-                        SetColor(ref.frm, CIC_ITEM, 0x2020c0)
+                        set_color(ref.frm, CIC_ITEM, 0x2020c0)
 
                     break
 
@@ -68,14 +68,14 @@ class IntegerIssues():
         which should correspond to the size argument
         @returns: list of arguments (may be empty)
         """
-        dang_name = GetOpnd(ea, 0)
+        dang_name = print_operand(ea, 0)
         dang_arg_idx = 0
         #x86_64_regs = ['rdi', 'rsi', 'rdx', 'rcx', 'r8', 'r9'] # System V AMD64 ABI
         x86_64_regs = ['rcx', 'rdx', 'r8', 'r9'] # Microsoft x64
 
         # TODO: the algo as a whole is flaky...
         # which paths are being considered?
-        for pat, arg_idx in self.dangerous_patterns.iteritems():
+        for pat, arg_idx in self.dangerous_patterns.items():
             if pat in dang_name:
                 dang_arg_idx = arg_idx
 
@@ -94,7 +94,7 @@ class IntegerIssues():
 
             if pi.get_canon_mnem() == 'push':
                 dang_arg_idx -= 1
-                push_op = GetOpnd(pi.ea, 0)
+                push_op = print_operand(pi.ea, 0)
                 dang_args.append(push_op)
 
             prev_addr = pi.ea
@@ -120,7 +120,7 @@ class IntegerIssues():
         for pred in bg.get_block_preds(dangerous_ea):
             # Final instruction of the predecessor
             # Must be the last instruction per definition
-            jumpi = bg.get_block_tail_ins(pred.startEA)
+            jumpi = bg.get_block_tail_ins(pred.start_ea)
 
             if not jumpi:
                 continue
@@ -134,13 +134,13 @@ class IntegerIssues():
                 if not cmpi:
                     continue
 
-                if GetMnem(cmpi.ea) == "cmp":
-                    return (GetOpnd(cmpi.ea, 0), GetOpnd(cmpi.ea, 1))
+                if print_insn_mnem(cmpi.ea) == "cmp":
+                    return (print_operand(cmpi.ea, 0), print_operand(cmpi.ea, 1))
 
-                elif GetMnem(cmpi.ea) == "test":
+                elif print_insn_mnem(cmpi.ea) == "test":
                     # Eliminate this case: test eax, eax
-                    if GetOpnd(cmpi.ea, 0) != GetOpnd(cmpi.ea, 1):
-                        return (GetOpnd(cmpi.ea, 0), GetOpnd(cmpi.ea, 1))
+                    if print_operand(cmpi.ea, 0) != print_operand(cmpi.ea, 1):
+                        return (print_operand(cmpi.ea, 0), print_operand(cmpi.ea, 1))
 
         return None
 

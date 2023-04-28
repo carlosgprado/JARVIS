@@ -31,7 +31,7 @@ class BinaryAnalysis():
         self.cache = BinaryAnalysisCache()
         self.config = JConfig()
 
-        print "= Loading binary analysis module..."
+        print("= Loading binary analysis module...")
 
     def comments_in_function(self):
         """
@@ -42,7 +42,7 @@ class BinaryAnalysis():
         comments = []
 
         for addr, dis in misc.iter_disasm():
-            comm = Comment(addr)
+            comm = get_cmt(addr, 0)
             # Comment returns None if no comment
             if comm:
                 comments.append((addr, comm))
@@ -79,13 +79,13 @@ class BinaryAnalysis():
 
             for v in s:
                 try:
-                    str_t = GetStringType(v.ea)
+                    str_t = get_str_type(v.ea)
                     if str_t in (ASCSTR_C, ASCSTR_UNICODE):
-                        my_str = GetString(v.ea)
+                        my_str = get_strlit_contents(v.ea)
                         self.cache.string_list.append((v.ea, my_str))
 
                 except:
-                    print "Error processing string at %x" % v.ea
+                    print("Error processing string at %x" % v.ea)
 
     def get_string_references(self):
         """
@@ -95,12 +95,12 @@ class BinaryAnalysis():
         f = get_func(here())
         if not f:
             # get_func returned None
-            print '[x] This does not look like a function...'
+            print('[x] This does not look like a function...')
             return []
 
         s_refs = []
 
-        for ins_ea in FuncItems(f.startEA):
+        for ins_ea in FuncItems(f.start_ea):
             for xref in XrefsFrom(ins_ea, True):
                 if xref.type != 1: # Data_Offset
                     continue
@@ -127,12 +127,12 @@ class BinaryAnalysis():
             for funcAddr in Functions():
                 # stackoverflow ;)
                 nr_of_refs = sum(1 for e in XrefsTo(funcAddr, True))
-                ref_name = GetFunctionName(funcAddr)
+                ref_name = get_func_name(funcAddr)
                 referenceDict[funcAddr] = (nr_of_refs, ref_name)
 
             # Let's order this stuff nicely
-            sd = sorted(referenceDict.iteritems(), reverse = True,
-                        key = lambda (k, v): (v[0], k))
+            sd = sorted(iter(referenceDict.items()), reverse = True,
+                        key = lambda k_v: (k_v[1][0], k_v[0]))
             top_ref_list = list(itertools.islice(sd, number))
 
             # Cache it for later use
@@ -145,29 +145,29 @@ class BinaryAnalysis():
         The name says it all
         """
 
-        start = SelStart()
+        start = read_selection_start()
         if start == BADADDR:
-            print "Select the code to XOR"
+            print("Select the code to XOR")
             return False
 
-        end = SelEnd()
+        end = read_selection_end()
         if end == BADADDR:
-            print "Select the code to XOR"
+            print("Select the code to XOR")
             return False
 
         # Ask for the byte
-        key = AskLong(0, "Number to XOR selected area with (one byte!)")
+        key = ask_long(0, "Number to XOR selected area with (one byte!)")
         if key == -1:
-            print "Error"
+            print("Error")
             return False
 
         # This is the actual XORing routine. No magic here.
         position = start
         while position <= end:
-            PatchByte(position, Byte(position) ^ key)
+            patch_byte(position, Byte(position) ^ key)
             position += 1
 
-        print "Patched %d bytes [%08x - %08x]" % (end - start + 1, start, end)
+        print("Patched %d bytes [%08x - %08x]" % (end - start + 1, start, end))
 
     def find_imm_compares(self):
         """
@@ -179,9 +179,9 @@ class BinaryAnalysis():
 
         for addr, dis in misc.iter_disasm():
             if "cmp" in dis:
-                if GetOpType(addr, 1) == o_imm:  # 5: immediate value
+                if get_operand_type(addr, 1) == o_imm:  # 5: immediate value
                     # If this is ASCII, display for convenience
-                    v = GetOperandValue(addr, 1)
+                    v = get_operand_value(addr, 1)
                     if v > 0x20 and v <0x7F:
                         msg = "{0} ({1})".format(addr, chr(v))
                     else:
@@ -235,11 +235,11 @@ class BinaryAnalysis():
         # TODO: This is too x86...
         for f_addr in Functions():
             for ins in FuncItems(f_addr):
-                m = GetMnem(ins)
+                m = print_insn_mnem(ins)
                 if m == 'cmp' or m == 'test':
-                    if GetOpType(ins, 1) == 5:  # o_imm: immediate value
-                        if GetOpType(ins, 0) == 2:  # o_mem: memory ;)
-                            op1, op2 = GetOpnd(ins, 0), GetOpnd(ins, 1)
+                    if get_operand_type(ins, 1) == 5:  # o_imm: immediate value
+                        if get_operand_type(ins, 0) == 2:  # o_mem: memory ;)
+                            op1, op2 = print_operand(ins, 0), print_operand(ins, 1)
                             if 'dword_' in op1:
                                 # ex: cmp dword_xxx, 1000
                                 # ex2: cmp cs:dword_xxx, 0
@@ -259,7 +259,7 @@ class BinaryAnalysis():
         func_list = []
 
         for f_ea in Functions():
-            f_name = GetFunctionName(f_ea)
+            f_name = get_func_name(f_ea)
             func_list.append((f_ea, f_name))
 
         return func_list
@@ -306,7 +306,7 @@ class BinaryAnalysis():
             # Use current function
             ea = misc.function_boundaries()[0]
 
-        io_list = self.locate_file_io().keys() + self.locate_net_io().keys()
+        io_list = list(self.locate_file_io().keys()) + list(self.locate_net_io().keys())
 
         for caller_ea in io_list:
             cg = self.get_connect_graph(caller_ea, ea)
@@ -331,7 +331,7 @@ class BinaryAnalysis():
 
         # Loop from start to end within the current segment
         for func_name in dangerous_funcs:
-            func_addr = LocByName(func_name)
+            func_addr = get_name_ea_simple(func_name)
 
             if func_addr == BADADDR:
                 continue
@@ -398,13 +398,13 @@ class BinaryAnalysis():
         @returns: dict of tuples (op_ea, s)
         """
         sneaky_dict = {}
-        gpa_ea = LocByName("GetProcAddress") # EA
+        gpa_ea = get_name_ea_simple("GetProcAddress") # EA
 
         for caller in XrefsTo(gpa_ea, True):
             # This is the address (within a function)
             # where the reference was made
             caller_ea = caller.frm
-            caller_name = GetFunctionName(caller_ea)
+            caller_name = get_func_name(caller_ea)
 
             if caller_name not in sneaky_dict:
                 sneaky_dict[caller_name] = []
@@ -418,14 +418,14 @@ class BinaryAnalysis():
                 # Best effort
                 continue
 
-            string_addr = GetOperandValue(op_ea, 0)
-            str_t = GetStringType(string_addr)
+            string_addr = get_operand_value(op_ea, 0)
+            str_t = get_str_type(string_addr)
 
             if str_t in (ASCSTR_C, ASCSTR_UNICODE):
-                s = GetString(string_addr)
+                s = get_strlit_contents(string_addr)
                 sneaky_dict[caller_name].append((op_ea, s))
-                print "{0} @ {1:08x} >> '{2}' <<".format(
-                        caller_name, op_ea, s)
+                print("{0} @ {1:08x} >> '{2}' <<".format(
+                        caller_name, op_ea, s))
 
         return sneaky_dict
 

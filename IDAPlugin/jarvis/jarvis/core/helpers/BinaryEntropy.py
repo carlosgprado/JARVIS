@@ -13,7 +13,7 @@ import struct
 from collections import defaultdict
 from math import log
 
-from Misc import entropy
+from .Misc import entropy
 
 
 class BinaryEntropy():
@@ -34,7 +34,7 @@ class BinaryEntropy():
         the binary size
         :return: integer
         """
-        bin_size = MaxEA() - MinEA()
+        bin_size = inf_get_max_ea() - inf_get_min_ea()
 
         # NOTE: this is integer division (it rounds below)
         block_size = bin_size / self.nr_cells
@@ -49,8 +49,8 @@ class BinaryEntropy():
         """
         block_size = self.block_size
 
-        for idx in xrange(self.nr_cells):
-            block_start = MinEA() + (idx * block_size)
+        for idx in range(self.nr_cells):
+            block_start = inf_get_min_ea() + (idx * block_size)
             # NOTE: GetManyBytes return a str object
             block_bytes = GetManyBytes(block_start, block_size)
 
@@ -66,8 +66,8 @@ class BinaryEntropy():
                     self.entropy_d[idx] = block_entropy
 
                 except:
-                    print "[!] Problem calculating block entropy (block %d)" % idx
-                    print "[!] Between %08x - %08x" % (block_start, block_start + block_size)
+                    print("[!] Problem calculating block entropy (block %d)" % idx)
+                    print("[!] Between %08x - %08x" % (block_start, block_start + block_size))
                     self.entropy_d[idx] = 3
 
     #################################################################
@@ -84,7 +84,7 @@ class BinaryEntropy():
         entropy_max = log(self.block_size, 2)
 
         # Correction: (e / e_max) * MAX
-        for idx, e in enumerate(self.entropy_d.itervalues()):
+        for idx, e in enumerate(self.entropy_d.values()):
 
             adjusted_entropy = int((e / entropy_max) * RGB32_MAX)
 
@@ -100,8 +100,8 @@ class BinaryEntropy():
         :return: Address within the binary
         """
         chunk_nr = (y % self.grid_size) * self.grid_size + x % self.grid_size
-        addr = MinEA() + chunk_nr * self.block_size
+        addr = inf_get_min_ea() + chunk_nr * self.block_size
 
-        print "%x" % addr
+        print("%x" % addr)
 
-        idc.Jump(addr)
+        idc.jumpto(addr)

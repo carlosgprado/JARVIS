@@ -92,7 +92,7 @@ class VulnDetectionWidget(CustomWidget):
         self.tree.clear()
         self.tree.setHeaderLabels(("Banned function", "References", "Name"))
 
-        for f_name, refs in banned_refs_dict.iteritems():
+        for f_name, refs in banned_refs_dict.items():
             bf_item = QTreeWidgetItem(self.tree)
             bf_item.setText(0, f_name)
 

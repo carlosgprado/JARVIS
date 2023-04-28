@@ -18,20 +18,20 @@ class Codatify(object):
     def __init__(self, say = None):
         self.say = say
         if self.get_start_ea(self.DATA) == idc.BADADDR:
-            if idc.AskYN(0, "There are no data segments defined! This probably won't end well. Continue?") != 1:
+            if idc.ask_yn(0, "There are no data segments defined! This probably won't end well. Continue?") != 1:
                 raise Exception("Action cancelled by user.")
 
     # Get the start of the specified segment type (2 == code, 3 == data)
     def get_start_ea(self, attr):
         ea = idc.BADADDR
-        seg = idc.FirstSeg()
+        seg = idc.get_first_seg()
 
         while seg != idc.BADADDR:
-            if idc.GetSegmentAttr(seg, idc.SEGATTR_TYPE) == attr:
+            if idc.get_segm_attr(seg, idc.SEGATTR_TYPE) == attr:
                 ea = seg
                 break
             else:
-                seg = idc.NextSeg(seg)
+                seg = idc.get_next_seg(seg)
 
         return ea
 
@@ -41,13 +41,13 @@ class Codatify(object):
         ea = self.get_start_ea(self.DATA)
 
         if ea == idc.BADADDR:
-            ea = idc.FirstSeg()
+            ea = idc.get_first_seg()
 
-        self.say("Looking for possible strings starting at: %s:0x%X..." % (idc.SegName(ea), ea))
+        self.say("Looking for possible strings starting at: %s:0x%X..." % (idc.get_segm_name(ea), ea))
 
         for s in idautils.Strings():
             if s.ea > ea:
-                if not idc.isASCII(idc.GetFlags(s.ea)) and idc.MakeStr(s.ea, idc.BADADDR):
+                if not idc.is_strlit(idc.get_full_flags(s.ea)) and idc.MakeStr(s.ea, idc.BADADDR):
                     n += 1
 
         self.say("created %d new ASCII strings" % n)
@@ -56,18 +56,18 @@ class Codatify(object):
     def datify(self):
         ea = self.get_start_ea(self.DATA)
         if ea == idc.BADADDR:
-            ea = idc.FirstSeg()
+            ea = idc.get_first_seg()
 
         self.say("Converting remaining data to DWORDs...",)
 
         while ea != idc.BADADDR:
-            flags = idc.GetFlags(ea)
+            flags = idc.get_full_flags(ea)
 
             if (idc.isUnknown(flags) or idc.isByte(flags)) and ((ea % 4) == 0):
                 idc.MakeDword(ea)
                 idc.OpOff(ea, 0, 0)
 
-            ea = idc.NextAddr(ea)
+            ea = idc.next_addr(ea)
 
         self.say("done.")
 
@@ -80,11 +80,11 @@ class Codatify(object):
 
         for (name_ea, name) in idautils.Names():
             for xref in idautils.XrefsTo(name_ea):
-                xref_name = idc.Name(xref.frm)
+                xref_name = idc.get_name(xref.frm)
                 if xref_name and xref_name.startswith("off_"):
                     i = 0
                     new_name = name + "_ptr"
-                    while idc.LocByName(new_name) != idc.BADADDR:
+                    while idc.get_name_ea_simple(new_name) != idc.BADADDR:
                         new_name = name + "_ptr%d" % i
                         i += 1
 
@@ -103,9 +103,10 @@ class Codatify(object):
 
         while ea != idaapi.BADADDR:
             (ea, n) = idaapi.find_notype(ea, idaapi.SEARCH_DOWN)
-            if idaapi.decode_insn(ea):
-                for i in range(0, len(idaapi.cmd.Operands)):
-                    op = idaapi.cmd.Operands[i]
+            cmd = insn_t()
+            if idaapi.decode_insn(cmd, ea) != 0:
+                for i in range(0, len(cmd.ops)):
+                    op = cmd.ops[i]
                     if op.type == idaapi.o_imm and idaapi.getseg(op.value):
                         idaapi.add_dref(ea, op.value, (idaapi.dr_O | idaapi.XREF_USER))
                         count += 1
@@ -120,14 +121,14 @@ class Codatify(object):
         if ea == idc.BADADDR:
             ea = self.get_start_ea(self.CODE)
             if ea == idc.BADADDR:
-                ea = idc.FirstSeg()
+                ea = idc.get_first_seg()
 
-        self.say("\nLooking for undefined code starting at: %s:0x%X" % (idc.SegName(ea), ea))
+        self.say("\nLooking for undefined code starting at: %s:0x%X" % (idc.get_segm_name(ea), ea))
 
         while ea != idc.BADADDR:
             try:
-                if idc.GetSegmentAttr(ea, idc.SEGATTR_TYPE) == self.CODE:
-                    if idc.GetFunctionName(ea) != '':
+                if idc.get_segm_attr(ea, idc.SEGATTR_TYPE) == self.CODE:
+                    if idc.get_func_name(ea) != '':
                         ea = idc.FindFuncEnd(ea)
                         continue
                     else:
@@ -138,6 +139,6 @@ class Codatify(object):
             except:
                 pass
 
-            ea = idc.NextAddr(ea)
+            ea = idc.next_addr(ea)
 
         self.say("Created %d new functions and %d new code blocks\n" % (func_count, code_count))

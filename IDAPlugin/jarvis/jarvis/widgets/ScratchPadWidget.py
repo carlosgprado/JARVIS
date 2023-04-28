@@ -70,8 +70,8 @@ class ScratchPadWidget(QWidget):
             with open(filename, 'w') as f:
                 f.write(sp_text)
 
-            print "Saved notes to \"%s\"" % filename
+            print("Saved notes to \"%s\"" % filename)
 
         except Exception as e:
-            print "[!] Problem saving notes..."
-            print traceback.format_exc()
+            print("[!] Problem saving notes...")
+            print(traceback.format_exc())

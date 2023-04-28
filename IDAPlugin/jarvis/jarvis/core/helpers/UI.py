@@ -7,8 +7,9 @@
 from idc import *
 from idaapi import *
 from idautils import *
+import ida_funcs
 
-from InfoUI import InfoUI
+from .InfoUI import InfoUI
 
 hooks = None
 
@@ -23,12 +24,12 @@ class InitBBHandler(action_handler_t):
 
     def activate(self, ctx):
         InfoUI.bb_start = here()
-        print "UI: bb_start %x" % InfoUI.bb_start
+        print("UI: bb_start %x" % InfoUI.bb_start)
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == \
-            BWN_DISASM else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_WIDGET if ctx.form_type == \
+            BWN_DISASM else AST_DISABLE_FOR_WIDGET
 
 
 class FinalBBHandler(action_handler_t):
@@ -41,12 +42,12 @@ class FinalBBHandler(action_handler_t):
 
     def activate(self, ctx):
         InfoUI.bb_end = here()
-        print "UI: bb_end %x" % InfoUI.bb_end
+        print("UI: bb_end %x" % InfoUI.bb_end)
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == \
-            BWN_DISASM else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_WIDGET if ctx.form_type == \
+            BWN_DISASM else AST_DISABLE_FOR_WIDGET
 
 
 class InitialFuncHandler(action_handler_t):
@@ -61,17 +62,17 @@ class InitialFuncHandler(action_handler_t):
         # Thx to Arnaud :)
         idx_l = list(ctx.chooser_selection)
         if len(idx_l) > 1:
-            print "UI: multiple selection not allowed!"
+            print("UI: multiple selection not allowed!")
             return 1
 
-        f = getn_func(idx_l[0] - 1)
-        InfoUI.function_orig_ea = f.startEA
-        print "UI: func_start %x" % InfoUI.function_orig_ea
+        f = ida_funcs.getn_func(idx_l[0] - 1)
+        InfoUI.function_orig_ea = f.start_ea
+        print("UI: func_start %x" % InfoUI.function_orig_ea)
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == \
-            BWN_FUNCS else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_WIDGET if ctx.form_type == \
+            BWN_FUNCS else AST_DISABLE_FOR_WIDGET
 
 
 class FinalFuncHandler(action_handler_t):
@@ -85,17 +86,17 @@ class FinalFuncHandler(action_handler_t):
     def activate(self, ctx):
         idx_l = list(ctx.chooser_selection)
         if len(idx_l) > 1:
-            print "UI: multiple selection not allowed!"
+            print("UI: multiple selection not allowed!")
             return 1
 
-        f = getn_func(idx_l[0] - 1)
-        InfoUI.function_dest_ea = f.startEA
-        print "UI: func_end %x" % InfoUI.function_dest_ea
+        f = ida_funcs.getn_func(idx_l[0] - 1)
+        InfoUI.function_dest_ea = f.start_ea
+        print("UI: func_end %x" % InfoUI.function_dest_ea)
         return 1
 
     def update(self, ctx):
-        return AST_ENABLE_FOR_FORM if ctx.form_type == \
-            BWN_FUNCS else AST_DISABLE_FOR_FORM
+        return AST_ENABLE_FOR_WIDGET if ctx.form_type == \
+            BWN_FUNCS else AST_DISABLE_FOR_WIDGET
 
 
 class Hooks(UI_Hooks):
@@ -103,15 +104,15 @@ class Hooks(UI_Hooks):
     Attach the action to a context menu after
     it has been created
     """
-    def finish_populating_tform_popup(self, form, popup):
+    def finish_populating_widget_popup(self, form, popup):
         # Insert the action once the context menu
         # has been populated.
         # Submenu Others
-        if get_tform_type(form) == BWN_DISASM:
+        if get_widget_type(form) == BWN_DISASM:
             attach_action_to_popup(form, popup, 'bb:initial', 'JARVIS/')
             attach_action_to_popup(form, popup, 'bb:final', 'JARVIS/')
 
-        elif get_tform_type(form) == BWN_FUNCS:
+        elif get_widget_type(form) == BWN_FUNCS:
             attach_action_to_popup(form, popup, 'func:initial', 'JARVIS/')
             attach_action_to_popup(form, popup, 'func:final', 'JARVIS/')
 
@@ -165,8 +166,8 @@ def install_ui_hooks():
     register_action(init_func_desc)
     register_action(final_func_desc)
 
-    print 'UI: Actions registered...'
+    print('UI: Actions registered...')
 
     hooks = Hooks()
     if hooks.hook():
-        print 'UI: Hook installed successfully'
+        print('UI: Hook installed successfully')

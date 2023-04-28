@@ -10,15 +10,15 @@ from idautils import *
 
 from collections import defaultdict
 
-from InfoUI import InfoUI
-import Misc as misc
+from .InfoUI import InfoUI
+from . import Misc as misc
 
 try:
     import networkx as nx
 
 except:
-    print "[!] Could not import NetworkX"
-    print "[!] Some functionality will not be available"
+    print("[!] Could not import NetworkX")
+    print("[!] Some functionality will not be available")
 
 
 class ConnectGraph(GraphViewer):
@@ -40,17 +40,17 @@ class ConnectGraph(GraphViewer):
         self.Clear()
         id_node = dict()  # { node_ea : node_id }
 
-        for node_ea in self.graph.keys():
+        for node_ea in list(self.graph.keys()):
             # First, add all nodes and populate the id_node list
             id_node[node_ea] = self.AddNode(node_ea)
 
-        for paths in self.graph.values():
+        for paths in list(self.graph.values()):
             # Add nodes without children (only ingress)
             for node_ea in paths:
                 if node_ea not in id_node:
                     id_node[node_ea] = self.AddNode(node_ea)
 
-        for node_ea, child_set in self.graph.iteritems():
+        for node_ea, child_set in self.graph.items():
             # Link the node with parents and children
             # These 'children' elements are *all* references from the node,
             # not just the ones belonging to the connected graph.
@@ -62,13 +62,13 @@ class ConnectGraph(GraphViewer):
 
         # Calculate a handy reverse dictionary { node_id: node_ea }
         self.AddrNode = dict()
-        for ea, id in id_node.iteritems():
+        for ea, id in id_node.items():
             self.AddrNode[id] = ea
 
         return True
 
     def OnGetText(self, node_id):
-        return GetFunctionName(self.AddrNode[node_id]), 0x800000
+        return get_func_name(self.AddrNode[node_id]), 0x800000
 
     def OnDblClick(self, node_id):
         """
@@ -102,7 +102,7 @@ class ConnectGraph(GraphViewer):
         # Add some handy commands to the graph view :)
         self.cmd_close = self.AddCommand("Close", "F2")
         if self.cmd_close == 0:
-            print "[debug] Failed to add popup menu item for GraphView"
+            print("[debug] Failed to add popup menu item for GraphView")
 
         return True
 
@@ -113,7 +113,7 @@ class FunctionGraph():
         It leverages FlowChart API in order to calculate
         some graph properties (function granularity)
         """
-        print "Instantiating a FunctionGraph object..."
+        print("Instantiating a FunctionGraph object...")
 
     def connect_graph(self, u, v, co):
         """
@@ -159,7 +159,7 @@ class BlockGraph():
 
         for bb in f:
             for child in bb.succs():
-                bb_dict[bb.startEA].append(child.startEA)
+                bb_dict[bb.start_ea].append(child.start_ea)
 
         return bb_dict
 
@@ -172,7 +172,7 @@ class BlockGraph():
         """
         dg = nx.DiGraph()
 
-        for node, children in bb_dict.iteritems():
+        for node, children in bb_dict.items():
             for child in children:
                 dg.add_edge(node, child)
 
@@ -197,17 +197,17 @@ class BlockGraph():
             bb_end = InfoUI.bb_end
 
         except AttributeError:
-            print '[!] find_connected_paths: check your marked start and end basic blocks!'
+            print('[!] find_connected_paths: check your marked start and end basic blocks!')
             return None
 
         # Sanity check.
         # Basic blocks within current function?
-        bbl = [bb.startEA for bb in self.f]
+        bbl = [bb.start_ea for bb in self.f]
 
         # bbl contains startEA's. However, we may have clicked
         # *somewhere* within the basic block :-/
-        _bb_start = self.get_block_from_ea(bb_start).startEA
-        _bb_end = self.get_block_from_ea(bb_end).startEA
+        _bb_start = self.get_block_from_ea(bb_start).start_ea
+        _bb_end = self.get_block_from_ea(bb_end).start_ea
 
         if _bb_start in bbl and _bb_end in bbl:
             # TODO: Select cutoff in OPTIONS widget at runtime
@@ -215,7 +215,7 @@ class BlockGraph():
             return paths
 
         else:
-            print '[!] find_connected_paths: check your marked start and end basic blocks!'
+            print('[!] find_connected_paths: check your marked start and end basic blocks!')
             return None
 
     def get_block_from_ea(self, ea):
@@ -224,8 +224,8 @@ class BlockGraph():
         containing ea or None
         """
         for bb in self.f:
-            # Remember that bb.endEA is bb.startEA of the next one!
-            if ea >= bb.startEA and ea < bb.endEA:
+            # Remember that bb.end_ea is bb.start_ea of the next one!
+            if ea >= bb.start_ea and ea < bb.end_ea:
                 return bb
 
         return None
@@ -251,7 +251,7 @@ class BlockGraph():
         bb = self.get_block_from_ea(ea)
         # This is actually the first instruction
         # of the successor basic block
-        e = bb.endEA
+        e = bb.end_ea
         tail = DecodePreviousInstruction(e)
 
         return tail

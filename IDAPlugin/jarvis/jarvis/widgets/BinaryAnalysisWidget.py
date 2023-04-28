@@ -372,7 +372,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         # Fill the tree with items
         self.tree.setHeaderLabels(("Dword", "Values", "Address"))
 
-        for dw, values in dw_dict.iteritems():
+        for dw, values in dw_dict.items():
             dw_item = QTreeWidgetItem(self.tree)
             dw_item.setText(0, dw)
 
@@ -391,7 +391,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         sneaky_dict = self.ba.get_sneaky_imports()
         self.tree.setHeaderLabels(("Caller", "Address", "Import"))
 
-        for caller, values in sneaky_dict.iteritems():
+        for caller, values in sneaky_dict.items():
             sneaky_item = QTreeWidgetItem(self.tree)
             sneaky_item.setText(0, caller)
 
@@ -508,7 +508,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
         try:
             conn_graphs = self.ba.get_all_dangerous_connections()
         except Exception as e:
-            print "[!] Error in get_all_dangerous_connections()", e
+            print("[!] Error in get_all_dangerous_connections()", e)
             return
 
         if not conn_graphs:
@@ -606,7 +606,7 @@ class BinaryAnalysisWidget(cw.CustomWidget):
                 misc.paint_basic_blocks(bb_path, ida_color)
 
             else:
-                print '[x] Invalid QColor'
+                print('[x] Invalid QColor')
 
             return
 
